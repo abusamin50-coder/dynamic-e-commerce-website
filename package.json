@@ -1,11 +1,10 @@
 {
-  "name": "prostore-production",
+  "name": "prostore-root",
   "version": "1.0.0",
-  "description": "Fullstack E-commerce",
-  "main": "backend/server.js",
-  "license": "ISC",
+  "description": "Root for ProStore E-commerce",
   "scripts": {
     "start": "node backend/server.js",
+    "dev": "npm run dev --prefix backend",
     "install-backend": "cd backend && npm install",
     "build": "npm run install-backend"
   }
