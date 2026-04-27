@@ -1,167 +1,309 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ProStore | Modern E-commerce</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="assets/js/config.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
     <style>
-        html { scroll-behavior: smooth; }
-        .category-btn.active { background-color: #2563eb; color: white; border-color: #2563eb; }
-        #toast { transform: translateX(120%); transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 1000; }
-        #toast.show { transform: translateX(0); }
-        .hero-bg {
-            height: 100vh;
-            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
-                              url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }
-        .status-badge-card {
-            position: absolute; top: 10px; right: 10px; padding: 4px 10px; font-size: 10px;
-            font-weight: 900; text-transform: uppercase; border-radius: 6px; z-index: 20;
-        }
+      html {
+        scroll-behavior: smooth;
+      }
+      .category-btn.active {
+        background-color: #2563eb;
+        color: white;
+        border-color: #2563eb;
+      }
+      #toast {
+        transform: translateX(120%);
+        transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        z-index: 1000;
+      }
+      #toast.show {
+        transform: translateX(0);
+      }
+      .hero-bg {
+        height: 100vh;
+        background-image:
+          linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+          url("https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+      }
+      .status-badge-card {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 4px 10px;
+        font-size: 10px;
+        font-weight: 900;
+        text-transform: uppercase;
+        border-radius: 6px;
+        z-index: 20;
+      }
     </style>
-</head>
-<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
-
+  </head>
+  <body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-green-600 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4">
-        <div id="toast-icon-bg" class="bg-white/20 w-8 h-8 rounded-full flex items-center justify-center"><i id="toast-icon" class="fa-solid fa-check"></i></div>
-        <div><p id="toast-title" class="font-bold text-sm">Success!</p><p id="toast-msg" class="text-xs opacity-90"></p></div>
+    <div
+      id="toast"
+      class="fixed bottom-5 right-5 bg-green-600 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4"
+    >
+      <div
+        id="toast-icon-bg"
+        class="bg-white/20 w-8 h-8 rounded-full flex items-center justify-center"
+      >
+        <i id="toast-icon" class="fa-solid fa-check"></i>
+      </div>
+      <div>
+        <p id="toast-title" class="font-bold text-sm">Success!</p>
+        <p id="toast-msg" class="text-xs opacity-90"></p>
+      </div>
     </div>
 
     <!-- NAVBAR -->
     <nav class="bg-white shadow-md sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="index.html" class="text-2xl font-bold text-blue-600 tracking-tighter">ProStore</a>
-            <div class="hidden md:flex flex-1 mx-10">
-                <div class="relative w-full">
-                    <input type="text" id="searchInput" placeholder="Search for products..." class="w-full border border-gray-200 rounded-full px-5 py-2.5 focus:outline-none">
-                    <button onclick="searchProducts()" class="absolute right-4 top-3 text-gray-400 hover:text-blue-600"><i class="fa-solid fa-magnifying-glass"></i></button>
-                </div>
-            </div>
-            <div class="flex items-center space-x-6" id="nav-actions">
-                <a href="login.html" class="text-gray-600 font-bold">Login</a>
-                <a href="cart.html" class="relative text-gray-600"><i class="fa-solid fa-cart-shopping text-xl"></i></a>
-            </div>
+      <div
+        class="container mx-auto px-4 py-3 flex items-center justify-between"
+      >
+        <a
+          href="index.html"
+          class="text-2xl font-bold text-blue-600 tracking-tighter"
+          >ProStore</a
+        >
+        <div class="hidden md:flex flex-1 mx-10">
+          <div class="relative w-full">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search for products..."
+              class="w-full border border-gray-200 rounded-full px-5 py-2.5 focus:outline-none"
+            />
+            <button
+              onclick="searchProducts()"
+              class="absolute right-4 top-3 text-gray-400 hover:text-blue-600"
+            >
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+          </div>
         </div>
+        <div class="flex items-center space-x-6" id="nav-actions">
+          <a href="login.html" class="text-gray-600 font-bold">Login</a>
+          <a href="cart.html" class="relative text-gray-600"
+            ><i class="fa-solid fa-cart-shopping text-xl"></i
+          ></a>
+        </div>
+      </div>
     </nav>
 
     <!-- HERO -->
-    <header class="hero-bg relative flex items-center justify-center text-center px-4">
-        <div class="max-w-4xl">
-            <span class="text-blue-400 font-black uppercase tracking-[0.3em] text-sm mb-4 block">Premium E-Commerce</span>
-            <h1 class="text-5xl md:text-7xl font-black text-white mb-6 leading-tight">Elevate Your <span class="text-blue-500">Everyday</span></h1>
-            <div class="flex items-center justify-center">
-                <a id="hero-shop-btn" href="login.html" class="bg-blue-600 text-white px-14 py-5 rounded-full font-black text-xl hover:bg-blue-700 transition shadow-2xl">Start Shopping</a>
-            </div>
+    <header
+      class="hero-bg relative flex items-center justify-center text-center px-4"
+    >
+      <div class="max-w-4xl">
+        <span
+          class="text-blue-400 font-black uppercase tracking-[0.3em] text-sm mb-4 block"
+          >Premium E-Commerce</span
+        >
+        <h1
+          class="text-5xl md:text-7xl font-black text-white mb-6 leading-tight"
+        >
+          Elevate Your <span class="text-blue-500">Everyday</span>
+        </h1>
+        <div class="flex items-center justify-center">
+          <a
+            id="hero-shop-btn"
+            href="login.html"
+            class="bg-blue-600 text-white px-14 py-5 rounded-full font-black text-xl hover:bg-blue-700 transition shadow-2xl"
+            >Start Shopping</a
+          >
         </div>
+      </div>
     </header>
 
     <!-- DYNAMIC CATEGORY SECTION -->
-    <section id="category-section" class="container mx-auto px-4 py-16 scroll-mt-20">
-        <h3 class="text-center text-gray-400 font-bold uppercase tracking-widest text-xs mb-8">Browse By Category</h3>
-        <div id="dynamic-categories" class="flex flex-wrap justify-center gap-4 md:gap-6">
-            <!-- Categories will load here automatically -->
-            <button onclick="filterCategory('All')" class="category-btn active px-8 py-3 rounded-xl border border-gray-200 font-bold transition shadow-sm">All</button>
-        </div>
+    <section
+      id="category-section"
+      class="container mx-auto px-4 py-16 scroll-mt-20"
+    >
+      <h3
+        class="text-center text-gray-400 font-bold uppercase tracking-widest text-xs mb-8"
+      >
+        Browse By Category
+      </h3>
+      <div
+        id="dynamic-categories"
+        class="flex flex-wrap justify-center gap-4 md:gap-6"
+      >
+        <!-- Categories will load here automatically -->
+        <button
+          onclick="filterCategory('All')"
+          class="category-btn active px-8 py-3 rounded-xl border border-gray-200 font-bold transition shadow-sm"
+        >
+          All
+        </button>
+      </div>
     </section>
 
     <!-- PRODUCTS -->
     <section id="products" class="container mx-auto px-4 py-8 flex-grow">
-        <div id="product-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10"></div>
+      <div
+        id="product-list"
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10"
+      ></div>
     </section>
 
     <!-- BEAUTIFUL FOOTER -->
     <footer class="bg-gray-900 text-white pt-20 pb-10 mt-20">
-        <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12 border-b border-gray-800 pb-12">
-            <div class="col-span-1 md:col-span-1">
-                <a href="index.html" class="text-3xl font-black text-blue-500">ProStore</a>
-                <p class="mt-4 text-gray-400 text-sm leading-relaxed">Your premium destination for high-quality lifestyle essentials. Quality guaranteed.</p>
-                <div class="flex gap-4 mt-6">
-                    <a href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-blue-600 transition"><i class="fa-brands fa-facebook-f text-xs"></i></a>
-                    <a href="#" class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-pink-600 transition"><i class="fa-brands fa-instagram text-xs"></i></a>
-                </div>
-            </div>
-            <div>
-                <h4 class="font-bold text-lg mb-6">Quick Links</h4>
-                <ul class="space-y-3 text-gray-400 text-sm">
-                    <li><a href="index.html" class="hover:text-blue-500 transition">Home</a></li>
-                    <li><a href="cart.html" class="hover:text-blue-500 transition">My Cart</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="font-bold text-lg mb-6">Support</h4>
-                <ul class="space-y-3 text-gray-400 text-sm">
-                    <li><a href="user.html" class="hover:text-blue-500 transition">Account Settings</a></li>
-                    <li><a href="#" class="hover:text-blue-500 transition">Privacy Policy</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="font-bold text-lg mb-6">Newsletter</h4>
-                <div class="flex flex-col gap-2">
-                    <input type="email" placeholder="Email Address" class="bg-gray-800 border-none rounded-lg px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500">
-                    <button class="bg-blue-600 hover:bg-blue-700 py-2 rounded-lg font-bold text-sm transition">Subscribe</button>
-                </div>
-            </div>
+      <div
+        class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12 border-b border-gray-800 pb-12"
+      >
+        <div class="col-span-1 md:col-span-1">
+          <a href="index.html" class="text-3xl font-black text-blue-500"
+            >ProStore</a
+          >
+          <p class="mt-4 text-gray-400 text-sm leading-relaxed">
+            Your premium destination for high-quality lifestyle essentials.
+            Quality guaranteed.
+          </p>
+          <div class="flex gap-4 mt-6">
+            <a
+              href="#"
+              class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-blue-600 transition"
+              ><i class="fa-brands fa-facebook-f text-xs"></i
+            ></a>
+            <a
+              href="#"
+              class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-pink-600 transition"
+              ><i class="fa-brands fa-instagram text-xs"></i
+            ></a>
+          </div>
         </div>
-        <div class="container mx-auto px-4 mt-10 text-center flex flex-col md:flex-row justify-between items-center gap-6">
-            <p class="text-gray-500 text-xs">&copy; 2024 ProStore E-Commerce. All rights reserved.</p>
-            <div class="flex gap-4 text-2xl text-gray-800">
-                <i class="fa-brands fa-cc-visa"></i>
-                <i class="fa-brands fa-cc-mastercard"></i>
-                <i class="fa-brands fa-cc-paypal"></i>
-            </div>
+        <div>
+          <h4 class="font-bold text-lg mb-6">Quick Links</h4>
+          <ul class="space-y-3 text-gray-400 text-sm">
+            <li>
+              <a href="index.html" class="hover:text-blue-500 transition"
+                >Home</a
+              >
+            </li>
+            <li>
+              <a href="cart.html" class="hover:text-blue-500 transition"
+                >My Cart</a
+              >
+            </li>
+          </ul>
         </div>
+        <div>
+          <h4 class="font-bold text-lg mb-6">Support</h4>
+          <ul class="space-y-3 text-gray-400 text-sm">
+            <li>
+              <a href="user.html" class="hover:text-blue-500 transition"
+                >Account Settings</a
+              >
+            </li>
+            <li>
+              <a href="#" class="hover:text-blue-500 transition"
+                >Privacy Policy</a
+              >
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-bold text-lg mb-6">Newsletter</h4>
+          <div class="flex flex-col gap-2">
+            <input
+              type="email"
+              placeholder="Email Address"
+              class="bg-gray-800 border-none rounded-lg px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500"
+            />
+            <button
+              class="bg-blue-600 hover:bg-blue-700 py-2 rounded-lg font-bold text-sm transition"
+            >
+              Subscribe
+            </button>
+          </div>
+        </div>
+      </div>
+      <div
+        class="container mx-auto px-4 mt-10 text-center flex flex-col md:flex-row justify-between items-center gap-6"
+      >
+        <p class="text-gray-500 text-xs">
+          &copy; 2024 ProStore E-Commerce. All rights reserved.
+        </p>
+        <div class="flex gap-4 text-2xl text-gray-800">
+          <i class="fa-brands fa-cc-visa"></i>
+          <i class="fa-brands fa-cc-mastercard"></i>
+          <i class="fa-brands fa-cc-paypal"></i>
+        </div>
+      </div>
     </footer>
 
     <script>
-        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-        let allProducts = [];
+      const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+      let allProducts = [];
 
-        window.logout = function() {
-            if (userInfo) { localStorage.removeItem(`cart_${userInfo.email}`); localStorage.removeItem('userInfo'); }
-            window.location.href = 'index.html';
-        };
-
-        function updateCartBadge() {
-            const badge = document.getElementById('cart-count');
-            if (!userInfo) { if(badge) badge.classList.add('hidden'); return; }
-            const cart = JSON.parse(localStorage.getItem(`cart_${userInfo.email}`)) || [];
-            if (badge) { badge.innerText = cart.length; badge.classList.toggle('hidden', cart.length === 0); }
+      window.logout = function () {
+        if (userInfo) {
+          localStorage.removeItem(`cart_${userInfo.email}`);
+          localStorage.removeItem("userInfo");
         }
+        window.location.href = "index.html";
+      };
 
-        // --- NEW DYNAMIC CATEGORY FETCH ---
-        async function fetchCategories() {
-            try {
-                const res = await fetch('http://localhost:5000/api/categories');
-                const categories = await res.json();
-                const container = document.getElementById('dynamic-categories');
-                
-                // Keep the "All" button and add others
-                container.innerHTML = `<button onclick="filterCategory('All')" class="category-btn active px-8 py-3 rounded-xl border border-gray-200 font-bold transition shadow-sm">All</button>` + 
-                categories.map(cat => `
+      function updateCartBadge() {
+        const badge = document.getElementById("cart-count");
+        if (!userInfo) {
+          if (badge) badge.classList.add("hidden");
+          return;
+        }
+        const cart =
+          JSON.parse(localStorage.getItem(`cart_${userInfo.email}`)) || [];
+        if (badge) {
+          badge.innerText = cart.length;
+          badge.classList.toggle("hidden", cart.length === 0);
+        }
+      }
+
+      // --- NEW DYNAMIC CATEGORY FETCH ---
+      async function fetchCategories() {
+        try {
+          const res = await fetch("http://localhost:5000/api/categories");
+          const categories = await res.json();
+          const container = document.getElementById("dynamic-categories");
+
+          // Keep the "All" button and add others
+          container.innerHTML =
+            `<button onclick="filterCategory('All')" class="category-btn active px-8 py-3 rounded-xl border border-gray-200 font-bold transition shadow-sm">All</button>` +
+            categories
+              .map(
+                (cat) => `
                     <button onclick="filterCategory('${cat.name}')" class="category-btn px-8 py-3 rounded-xl border border-gray-200 font-bold transition shadow-sm hover:border-blue-600 hover:text-blue-600">
                         ${cat.name}
                     </button>
-                `).join('');
-            } catch (err) {
-                console.error("Error loading categories");
-            }
+                `,
+              )
+              .join("");
+        } catch (err) {
+          console.error("Error loading categories");
         }
+      }
 
-        function setupUI() {
-            const shopBtn = document.getElementById('hero-shop-btn');
-            if (userInfo) {
-                shopBtn.href = "#category-section";
-                document.getElementById('nav-actions').innerHTML = `
+      function setupUI() {
+        const shopBtn = document.getElementById("hero-shop-btn");
+        if (userInfo) {
+          shopBtn.href = "#category-section";
+          document.getElementById("nav-actions").innerHTML = `
                     <div class="flex items-center space-x-6">
-                        ${userInfo.isAdmin ? '<a href="admin.html" class="bg-blue-600 text-white px-4 py-1.5 rounded-full text-xs font-black shadow-lg">DASHBOARD</a>' : ''}
+                        ${userInfo.isAdmin ? '<a href="admin.html" class="bg-blue-600 text-white px-4 py-1.5 rounded-full text-xs font-black shadow-lg">DASHBOARD</a>' : ""}
                         <a href="user.html" class="text-gray-600 flex items-center gap-2">
-                             <span class="hidden sm:inline font-bold text-sm">${userInfo.name.split(' ')[0]}</span>
+                             <span class="hidden sm:inline font-bold text-sm">${userInfo.name.split(" ")[0]}</span>
                              <i class="fa-solid fa-user-circle text-2xl transition"></i>
                         </a>
                         <a href="cart.html" class="relative text-gray-600">
@@ -170,79 +312,112 @@
                         </a>
                     </div>
                 `;
-            }
-            updateCartBadge();
         }
+        updateCartBadge();
+      }
 
-        async function fetchProducts() {
-            const res = await fetch('http://localhost:5000/api/products');
-            allProducts = await res.json();
-            renderProducts(allProducts);
-        }
+      async function fetchProducts() {
+        const res = await fetch(`${window.API_URL}/products`);
+        allProducts = await res.json();
+        renderProducts(allProducts);
+      }
 
-        function renderProducts(products) {
-            const list = document.getElementById('product-list');
-            const sorted = [...products].sort((a, b) => (b.countInStock > 0) - (a.countInStock > 0));
-            list.innerHTML = sorted.map(p => {
-                const isOutOfStock = p.countInStock <= 0;
-                return `
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group flex flex-col hover:shadow-2xl transition-all duration-500 ${isOutOfStock ? 'opacity-75' : ''}">
+      function renderProducts(products) {
+        const list = document.getElementById("product-list");
+        const sorted = [...products].sort(
+          (a, b) => (b.countInStock > 0) - (a.countInStock > 0),
+        );
+        list.innerHTML = sorted
+          .map((p) => {
+            const isOutOfStock = p.countInStock <= 0;
+            return `
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group flex flex-col hover:shadow-2xl transition-all duration-500 ${isOutOfStock ? "opacity-75" : ""}">
                     <a href="product.html?id=${p._id}" class="relative h-64 block overflow-hidden">
-                        <div class="status-badge-card ${isOutOfStock ? 'bg-red-600 text-white' : 'bg-green-500 text-white'}">${isOutOfStock ? 'Out of Stock' : 'In Stock'}</div>
-                        <img src="${p.image}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700 ${isOutOfStock ? 'grayscale' : ''}">
+                        <div class="status-badge-card ${isOutOfStock ? "bg-red-600 text-white" : "bg-green-500 text-white"}">${isOutOfStock ? "Out of Stock" : "In Stock"}</div>
+                        <img src="${p.image}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700 ${isOutOfStock ? "grayscale" : ""}">
                     </a>
                     <div class="p-6 flex-1 flex flex-col">
                         <h3 class="font-bold text-gray-900 text-lg mb-2 line-clamp-1">${p.name}</h3>
                         <div class="flex items-center justify-between mt-auto mb-4">
                             <span class="text-2xl font-black text-gray-900">$${p.price}</span>
-                            <button onclick="${isOutOfStock ? "showToast('Out of Stock!', 'error')" : `addToCart('${p._id}')`}" class="${isOutOfStock ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} text-white w-10 h-10 rounded-xl flex items-center justify-center transition shadow-lg"><i class="fa-solid fa-cart-plus"></i></button>
+                            <button onclick="${isOutOfStock ? "showToast('Out of Stock!', 'error')" : `addToCart('${p._id}')`}" class="${isOutOfStock ? "bg-gray-300 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"} text-white w-10 h-10 rounded-xl flex items-center justify-center transition shadow-lg"><i class="fa-solid fa-cart-plus"></i></button>
                         </div>
-                        <button onclick="${isOutOfStock ? "showToast('Out of Stock!', 'error')" : `buyNow('${p._id}')`}" class="w-full ${isOutOfStock ? 'bg-gray-300' : 'bg-gray-900 hover:bg-black'} text-white py-3 rounded-xl font-bold text-sm transition">${isOutOfStock ? 'Out of Stock' : 'Buy Now'}</button>
+                        <button onclick="${isOutOfStock ? "showToast('Out of Stock!', 'error')" : `buyNow('${p._id}')`}" class="w-full ${isOutOfStock ? "bg-gray-300" : "bg-gray-900 hover:bg-black"} text-white py-3 rounded-xl font-bold text-sm transition">${isOutOfStock ? "Out of Stock" : "Buy Now"}</button>
                     </div>
                 </div>
-            `}).join('');
+            `;
+          })
+          .join("");
+      }
+
+      function showToast(msg, type = "success") {
+        const toast = document.getElementById("toast");
+        if (type === "error") {
+          toast.classList.replace("bg-green-600", "bg-red-600");
+          document.getElementById("toast-title").innerText = "Error";
+        } else {
+          toast.classList.replace("bg-red-600", "bg-green-600");
+          document.getElementById("toast-title").innerText = "Success!";
         }
+        document.getElementById("toast-msg").innerText = msg;
+        toast.classList.add("show");
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 3000);
+      }
 
-        function showToast(msg, type = 'success') {
-            const toast = document.getElementById('toast');
-            if (type === 'error') { toast.classList.replace('bg-green-600', 'bg-red-600'); document.getElementById('toast-title').innerText = "Error"; } 
-            else { toast.classList.replace('bg-red-600', 'bg-green-600'); document.getElementById('toast-title').innerText = "Success!"; }
-            document.getElementById('toast-msg').innerText = msg;
-            toast.classList.add('show');
-            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+      function addToCart(id, silent = false) {
+        if (!userInfo) {
+          window.location.href = "login.html";
+          return;
         }
-
-        function addToCart(id, silent = false) {
-            if (!userInfo) { window.location.href = 'login.html'; return; }
-            let cartKey = `cart_${userInfo.email}`;
-            let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
-            const p = allProducts.find(x => x._id === id);
-            const exist = cart.find(x => x.product === id);
-            if (exist) { exist.qty++; } else { cart.push({ ...p, product: p._id, qty: 1 }); }
-            localStorage.setItem(cartKey, JSON.stringify(cart));
-            updateCartBadge();
-            if (!silent) showToast(`${p.name} added to cart!`);
+        let cartKey = `cart_${userInfo.email}`;
+        let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+        const p = allProducts.find((x) => x._id === id);
+        const exist = cart.find((x) => x.product === id);
+        if (exist) {
+          exist.qty++;
+        } else {
+          cart.push({ ...p, product: p._id, qty: 1 });
         }
+        localStorage.setItem(cartKey, JSON.stringify(cart));
+        updateCartBadge();
+        if (!silent) showToast(`${p.name} added to cart!`);
+      }
 
-        function buyNow(id) { if (!userInfo) { window.location.href = 'login.html'; return; } addToCart(id, true); window.location.href = 'cart.html'; }
-
-        function filterCategory(cat) { 
-            // Update Active UI
-            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            const filtered = cat === 'All' ? allProducts : allProducts.filter(x => x.category === cat);
-            renderProducts(filtered);
+      function buyNow(id) {
+        if (!userInfo) {
+          window.location.href = "login.html";
+          return;
         }
+        addToCart(id, true);
+        window.location.href = "cart.html";
+      }
 
-        function searchProducts() {
-            const q = document.getElementById('searchInput').value.toLowerCase();
-            renderProducts(allProducts.filter(p => p.name.toLowerCase().includes(q)));
-        }
+      function filterCategory(cat) {
+        // Update Active UI
+        document
+          .querySelectorAll(".category-btn")
+          .forEach((b) => b.classList.remove("active"));
+        event.target.classList.add("active");
 
-        setupUI();
-        fetchCategories(); // Load dynamic categories
-        fetchProducts();
+        const filtered =
+          cat === "All"
+            ? allProducts
+            : allProducts.filter((x) => x.category === cat);
+        renderProducts(filtered);
+      }
+
+      function searchProducts() {
+        const q = document.getElementById("searchInput").value.toLowerCase();
+        renderProducts(
+          allProducts.filter((p) => p.name.toLowerCase().includes(q)),
+        );
+      }
+
+      setupUI();
+      fetchCategories(); // Load dynamic categories
+      fetchProducts();
     </script>
-</body>
+  </body>
 </html>
