@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details | ProStore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        #toast { transform: translateX(120%); transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); z-index: 1000; }
+        #toast.show { transform: translateX(0); }
+        .status-badge-detail {
+            position: absolute; top: 15px; right: 15px; padding: 6px 15px; font-size: 12px;
+            font-weight: 900; text-transform: uppercase; border-radius: 8px; z-index: 20; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-green-600 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4">
+        <div id="toast-icon-bg" class="bg-white/20 w-8 h-8 rounded-full flex items-center justify-center"><i id="toast-icon" class="fa-solid fa-check"></i></div>
+        <div><p id="toast-title" class="font-bold text-sm">Success!</p><p id="toast-msg" class="text-xs opacity-90"></p></div>
+    </div>
+
+    <!-- NAVBAR -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <button onclick="window.history.back()" class="text-gray-400 hover:text-blue-600 transition text-xl"><i class="fa-solid fa-arrow-left"></i></button>
+                <a href="index.html" class="text-2xl font-bold text-blue-600">ProStore</a>
+            </div>
+            <div class="flex items-center space-x-6" id="nav-actions">
+                <a href="login.html" class="text-gray-600 font-bold">Login</a>
+                <a href="cart.html" class="relative text-gray-600"><i class="fa-solid fa-cart-shopping text-xl"></i></a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-12 flex-grow">
+        <div id="product-container">
+            <div class="flex justify-center py-20"><i class="fa-solid fa-spinner fa-spin text-4xl text-blue-600"></i></div>
+        </div>
+    </main>
+
+    <!-- BEAUTIFUL FOOTER -->
+    <footer class="bg-gray-900 text-white pt-20 pb-10 mt-20">
+        <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12 border-b border-gray-800 pb-12">
+            <div class="col-span-1 md:col-span-1">
+                <a href="index.html" class="text-3xl font-black text-blue-500">ProStore</a>
+                <p class="mt-4 text-gray-400 text-sm leading-relaxed">Your premium destination for high-quality electronics, fashion, and lifestyle essentials. Quality guaranteed.</p>
+            </div>
+            <div>
+                <h4 class="font-bold text-lg mb-6">Quick Links</h4>
+                <ul class="space-y-3 text-gray-400 text-sm">
+                    <li><a href="index.html" class="hover:text-blue-500 transition">Home</a></li>
+                    <li><a href="cart.html" class="hover:text-blue-500 transition">My Cart</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-lg mb-6">Support</h4>
+                <ul class="space-y-3 text-gray-400 text-sm">
+                    <li><a href="user.html" class="hover:text-blue-500 transition">Account</a></li>
+                    <li><a href="#" class="hover:text-blue-500 transition">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-lg mb-6">Newsletter</h4>
+                <input type="email" placeholder="Email Address" class="bg-gray-800 w-full border-none rounded-lg px-4 py-2 text-sm outline-none mb-2">
+                <button class="bg-blue-600 w-full hover:bg-blue-700 py-2 rounded-lg font-bold text-sm">Subscribe</button>
+            </div>
+        </div>
+        <div class="container mx-auto px-4 mt-10 text-center text-gray-500 text-xs">
+            &copy; 2024 ProStore E-Commerce. All rights reserved.
+        </div>
+    </footer>
+
+    <script>
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        let currentProduct = null;
+
+        function updateCartBadge() {
+            const badge = document.getElementById('cart-count');
+            if (!userInfo) { if(badge) badge.classList.add('hidden'); return; }
+            const cartKey = `cart_${userInfo.email}`;
+            const cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+            if(badge) { badge.innerText = cart.length; badge.classList.toggle('hidden', cart.length === 0); }
+        }
+
+        async function fetchDetails() {
+            const productId = new URLSearchParams(window.location.search).get('id');
+            const res = await fetch(`http://localhost:5000/api/products/${productId}`);
+            const p = await res.json();
+            currentProduct = p;
+            const isOutOfStock = p.countInStock <= 0;
+
+            document.getElementById('product-container').innerHTML = `
+                <div class="bg-white rounded-2xl shadow-sm border p-6 md:p-12">
+                    <div class="flex flex-col md:flex-row gap-12">
+                        <div class="flex-1 relative overflow-hidden rounded-xl bg-gray-50">
+                            <div class="status-badge-detail ${isOutOfStock ? 'bg-red-600 text-white' : 'bg-green-500 text-white'}">${isOutOfStock ? 'Out of Stock' : 'In Stock'}</div>
+                            <img src="${p.image}" class="w-full object-cover rounded-xl ${isOutOfStock ? 'grayscale opacity-60' : ''}">
+                        </div>
+                        <div class="flex-1">
+                            <span class="text-blue-600 font-bold uppercase text-sm">${p.category}</span>
+                            <h1 class="text-3xl md:text-5xl font-black mt-2 mb-4 text-gray-900">${p.name}</h1>
+                            <p class="text-4xl font-black text-gray-900 mb-6">$${p.price}</p>
+                            <p class="text-gray-600 text-lg mb-8">${p.description}</p>
+                            <button onclick="${isOutOfStock ? "showToast('Item Out of Stock', 'error')" : "addToCart()"}" class="w-full ${isOutOfStock ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'} text-white py-4 rounded-xl font-black transition flex items-center justify-center gap-3 shadow-lg">
+                                <i class="fa-solid fa-cart-plus"></i> ${isOutOfStock ? 'Unavailable' : 'Add to Cart'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            updateCartBadge();
+        }
+
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            if (type === 'error') { toast.classList.replace('bg-green-600', 'bg-red-600'); document.getElementById('toast-title').innerText = "Error"; } 
+            else { toast.classList.replace('bg-red-600', 'bg-green-600'); document.getElementById('toast-title').innerText = "Success!"; }
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function addToCart() {
+            if (!userInfo) { window.location.href = 'login.html'; return; }
+            let cartKey = `cart_${userInfo.email}`;
+            let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+            const exist = cart.find(x => x.product === currentProduct._id);
+            if (exist) { exist.qty++; } else { cart.push({ ...currentProduct, product: currentProduct._id, qty: 1 }); }
+            localStorage.setItem(cartKey, JSON.stringify(cart));
+            updateCartBadge();
+            showToast(`${currentProduct.name} added to cart!`);
+        }
+
+        if (userInfo) {
+            document.getElementById('nav-actions').innerHTML = `
+                <div class="flex items-center space-x-6">
+                    <a href="user.html" class="text-gray-600 flex items-center gap-2 font-bold text-sm">${userInfo.name.split(' ')[0]} <i class="fa-solid fa-user-circle text-2xl"></i></a>
+                    <a href="cart.html" class="relative text-gray-600"><i class="fa-solid fa-cart-shopping text-xl"></i><span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full hidden">0</span></a>
+                </div>
+            `;
+        }
+        fetchDetails();
+    </script>
+</body>
+</html>

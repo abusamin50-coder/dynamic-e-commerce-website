@@ -1,0 +1,10 @@
+{
+  "name": "my-ecommerce-root",
+  "version": "1.0.0",
+  "description": "Professional E-commerce Root",
+  "scripts": {
+    "backend": "npm run dev --prefix backend",
+    "start": "npm start --prefix backend",
+    "dev": "npm run dev --prefix backend"
+  }
+}

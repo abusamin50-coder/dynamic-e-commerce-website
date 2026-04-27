@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel | ProStore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body class="bg-gray-100 flex min-h-screen">
+    <!-- SIDEBAR -->
+    <aside
+      class="w-64 bg-gray-900 text-white hidden md:flex flex-col sticky top-0 h-screen"
+    >
+      <div
+        class="p-6 text-2xl font-black text-blue-400 tracking-tighter border-b border-gray-800"
+      >
+        ProAdmin
+      </div>
+      <nav class="flex-1 px-4 py-6 space-y-2">
+        <button
+          onclick="showSection('products-sec')"
+          class="w-full text-left px-4 py-3 hover:bg-gray-800 rounded-xl transition font-bold text-sm"
+        >
+          <i class="fa-solid fa-box mr-3"></i> Products
+        </button>
+        <button
+          onclick="showSection('categories-sec')"
+          class="w-full text-left px-4 py-3 hover:bg-gray-800 rounded-xl transition font-bold text-sm"
+        >
+          <i class="fa-solid fa-tags mr-3"></i> Categories
+        </button>
+        <button
+          onclick="showSection('users-sec')"
+          class="w-full text-left px-4 py-3 hover:bg-gray-800 rounded-xl transition font-bold text-sm"
+        >
+          <i class="fa-solid fa-users mr-3"></i> Users
+        </button>
+        <div class="pt-10 border-t border-gray-800 mt-6">
+          <a
+            href="index.html"
+            class="block px-4 py-3 text-blue-400 hover:bg-gray-800 rounded-xl font-bold text-sm"
+          >
+            <i class="fa-solid fa-earth-americas mr-3"></i> Back to Shop
+          </a>
+        </div>
+      </nav>
+      <div class="p-6 border-t border-gray-800">
+        <button
+          onclick="logout()"
+          class="text-red-500 font-black text-sm uppercase"
+        >
+          Logout
+        </button>
+      </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto">
+      <header
+        class="bg-white shadow-sm p-4 flex justify-between items-center px-8 sticky top-0 z-50"
+      >
+        <h2 class="text-xl font-black text-gray-800" id="dash-title">
+          Dashboard
+        </h2>
+        <div
+          id="admin-name"
+          class="font-bold text-blue-600 bg-blue-50 px-4 py-1 rounded-full text-sm"
+        >
+          Admin
+        </div>
+      </header>
+
+      <div class="p-8">
+        <!-- SECTION: PRODUCTS -->
+        <div id="products-sec" class="section-content">
+          <!-- Add/Edit Product Form -->
+          <section class="bg-white p-8 rounded-3xl shadow-sm border mb-10">
+            <h3 id="prod-form-title" class="text-lg font-black mb-6">
+              Product Management
+            </h3>
+            <form
+              id="productForm"
+              class="grid grid-cols-1 md:grid-cols-3 gap-6"
+            >
+              <input type="hidden" id="productId" />
+              <input
+                type="text"
+                id="name"
+                placeholder="Product Name"
+                class="border p-3 rounded-xl outline-none"
+                required
+              />
+              <input
+                type="number"
+                id="price"
+                placeholder="Price ($)"
+                class="border p-3 rounded-xl outline-none"
+                required
+              />
+              <input
+                type="number"
+                id="stock"
+                placeholder="Stock Quantity"
+                class="border p-3 rounded-xl outline-none"
+                required
+              />
+
+              <div class="md:col-span-3">
+                <label
+                  class="text-xs font-black text-gray-400 uppercase mb-2 block"
+                  >Select Category</label
+                >
+                <div
+                  id="dynamic-category-radios"
+                  class="flex flex-wrap gap-4 bg-gray-50 p-4 rounded-2xl border border-dashed"
+                >
+                  <!-- Categories will load here via JS -->
+                  <p class="text-gray-400 text-sm italic">
+                    Loading categories...
+                  </p>
+                </div>
+              </div>
+
+              <input
+                type="text"
+                id="image"
+                placeholder="Image URL"
+                class="md:col-span-3 border p-3 rounded-xl outline-none"
+                required
+              />
+              <textarea
+                id="description"
+                placeholder="Description"
+                class="md:col-span-3 border p-3 rounded-xl outline-none"
+                required
+              ></textarea>
+
+              <div class="md:col-span-3 flex gap-4">
+                <button
+                  type="submit"
+                  id="prod-submit-btn"
+                  class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-black"
+                >
+                  Save Product
+                </button>
+                <button
+                  type="button"
+                  onclick="resetProductForm()"
+                  id="prod-cancel-btn"
+                  class="hidden flex-1 bg-gray-400 text-white py-3 rounded-xl font-black"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <!-- Inventory Table -->
+          <div class="bg-white rounded-3xl border overflow-hidden shadow-sm">
+            <table class="w-full text-left border-collapse">
+              <thead
+                class="bg-gray-50 text-[10px] font-black text-gray-400 uppercase"
+              >
+                <tr>
+                  <th class="p-5 border-b">Product</th>
+                  <th class="p-5 border-b">Price</th>
+                  <th class="p-5 border-b">Category</th>
+                  <th class="p-5 border-b">Status</th>
+                  <th class="p-5 border-b">Action</th>
+                </tr>
+              </thead>
+              <tbody id="product-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SECTION: CATEGORIES (DYNAMIC MANAGEMENT) -->
+        <div id="categories-sec" class="section-content hidden">
+          <section
+            class="bg-white p-8 rounded-3xl shadow-sm border mb-10 max-w-2xl"
+          >
+            <h3
+              id="cat-form-title"
+              class="text-lg font-black mb-6 text-gray-800"
+            >
+              Add / Rename Category
+            </h3>
+            <form id="categoryForm" class="flex gap-4">
+              <input type="hidden" id="catId" />
+              <input
+                type="text"
+                id="catName"
+                placeholder="Category Name (e.g. Watches)"
+                class="flex-1 border p-3 rounded-xl outline-none focus:ring-2 focus:ring-blue-400"
+                required
+              />
+              <button
+                type="submit"
+                id="cat-submit-btn"
+                class="bg-gray-900 text-white px-8 py-3 rounded-xl font-black hover:bg-black transition"
+              >
+                Add
+              </button>
+              <button
+                type="button"
+                onclick="resetCatForm()"
+                id="cat-cancel-btn"
+                class="hidden bg-gray-400 text-white px-6 py-3 rounded-xl font-black"
+              >
+                Cancel
+              </button>
+            </form>
+          </section>
+
+          <div
+            class="bg-white rounded-3xl border overflow-hidden shadow-sm max-w-2xl"
+          >
+            <table class="w-full text-left border-collapse">
+              <thead
+                class="bg-gray-50 text-[10px] font-black text-gray-400 uppercase"
+              >
+                <tr>
+                  <th class="p-5 border-b">Category Name</th>
+                  <th class="p-5 border-b text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="category-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- SECTION: USERS -->
+        <div id="users-sec" class="section-content hidden">
+          <div class="bg-white rounded-3xl border overflow-hidden shadow-sm">
+            <table class="w-full text-left border-collapse">
+              <thead
+                class="bg-gray-50 text-[10px] font-black text-gray-400 uppercase"
+              >
+                <tr>
+                  <th class="p-5 border-b">User Info</th>
+                  <th class="p-5 border-b">Role</th>
+                  <th class="p-5 border-b text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="user-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <footer
+        class="bg-white py-10 mt-auto border-t text-center text-gray-400 text-xs font-bold"
+      >
+        &copy; 2024 ProStore Management System.
+      </footer>
+    </main>
+
+    <script>
+      const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+      const API_URL = "http://localhost:5000/api";
+
+      if (!userInfo || !userInfo.isAdmin) window.location.href = "login.html";
+
+      function logout() {
+        localStorage.removeItem("userInfo");
+        window.location.href = "index.html";
+      }
+
+      function showSection(id) {
+        document
+          .querySelectorAll(".section-content")
+          .forEach((s) => s.classList.add("hidden"));
+        document.getElementById(id).classList.remove("hidden");
+        document.getElementById("dash-title").innerText = id
+          .split("-")[0]
+          .toUpperCase();
+      }
+
+      // --- CATEGORY LOGIC ---
+      async function loadCategories() {
+        const res = await fetch(`${API_URL}/categories`);
+        const categories = await res.json();
+
+        // 1. Render Table
+        const body = document.getElementById("category-table-body");
+        body.innerHTML = categories
+          .map(
+            (c) => `
+                <tr class="hover:bg-gray-50 transition border-b">
+                    <td class="p-5 font-bold text-gray-800">${c.name}</td>
+                    <td class="p-5 text-right space-x-2">
+                        <button onclick="editCategory('${c._id}', '${c.name}')" class="text-blue-500 hover:text-blue-700 font-bold text-xs uppercase">Rename</button>
+                        <button onclick="deleteCategory('${c._id}')" class="text-red-500 hover:text-red-700 font-bold text-xs uppercase">Delete</button>
+                    </td>
+                </tr>
+            `,
+          )
+          .join("");
+
+        // 2. Render Product Form Radios
+        const radioContainer = document.getElementById(
+          "dynamic-category-radios",
+        );
+        if (categories.length === 0) {
+          radioContainer.innerHTML =
+            '<p class="text-red-500 text-sm">Please add a category first!</p>';
+        } else {
+          radioContainer.innerHTML = categories
+            .map(
+              (c) => `
+                    <label class="flex items-center gap-2 cursor-pointer bg-white px-4 py-2 rounded-lg border hover:border-blue-400 transition font-bold text-sm">
+                        <input type="radio" name="category" value="${c.name}" required> ${c.name}
+                    </label>
+                `,
+            )
+            .join("");
+        }
+      }
+
+      document
+        .getElementById("categoryForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const id = document.getElementById("catId").value;
+          const name = document.getElementById("catName").value;
+          const method = id ? "PUT" : "POST";
+          const url = id
+            ? `${API_URL}/categories/${id}`
+            : `${API_URL}/categories`;
+
+          const res = await fetch(url, {
+            method,
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${userInfo.token}`,
+            },
+            body: JSON.stringify({ name }),
+          });
+
+          if (res.ok) {
+            resetCatForm();
+            loadCategories();
+            loadProducts();
+          } else {
+            const err = await res.json();
+            alert(err.message);
+          }
+        });
+
+      function editCategory(id, name) {
+        document.getElementById("catId").value = id;
+        document.getElementById("catName").value = name;
+        document.getElementById("cat-submit-btn").innerText = "Update";
+        document.getElementById("cat-cancel-btn").classList.remove("hidden");
+      }
+
+      function resetCatForm() {
+        document.getElementById("categoryForm").reset();
+        document.getElementById("catId").value = "";
+        document.getElementById("cat-submit-btn").innerText = "Add";
+        document.getElementById("cat-cancel-btn").classList.add("hidden");
+      }
+
+      async function deleteCategory(id) {
+        if (
+          confirm(
+            "Delete Category? This will NOT delete products, but they will have no category.",
+          )
+        ) {
+          await fetch(`${API_URL}/categories/${id}`, {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${userInfo.token}` },
+          });
+          loadCategories();
+        }
+      }
+
+      // --- PRODUCT LOGIC ---
+      async function loadProducts() {
+        const res = await fetch(`${API_URL}/products`);
+        let products = await res.json();
+        products.sort((a, b) => (b.countInStock > 0) - (a.countInStock > 0));
+
+        const body = document.getElementById("product-table-body");
+        body.innerHTML = products
+          .map((p) => {
+            const isOutOfStock = p.countInStock <= 0;
+            return `
+                <tr class="hover:bg-gray-50 transition border-b">
+                    <td class="p-5 font-bold text-gray-800">${p.name}</td>
+                    <td class="p-5 font-black text-blue-600">$${p.price}</td>
+                    <td class="p-5 text-xs font-bold uppercase text-gray-400">${p.category}</td>
+                    <td class="p-5">
+                        <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase ${isOutOfStock ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"}">
+                            ${isOutOfStock ? "Out of Stock" : "In Stock (" + p.countInStock + ")"}
+                        </span>
+                    </td>
+                    <td class="p-5 space-x-3">
+                        <button onclick="editProduct('${p._id}')" class="text-blue-500 hover:scale-110 transition"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="deleteProduct('${p._id}')" class="text-red-500 hover:scale-110 transition"><i class="fa-solid fa-trash-can"></i></button>
+                    </td>
+                </tr>`;
+          })
+          .join("");
+      }
+
+      document
+        .getElementById("productForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const id = document.getElementById("productId").value;
+          const category = document.querySelector(
+            'input[name="category"]:checked',
+          )?.value;
+          if (!category) {
+            alert("Please select a category!");
+            return;
+          }
+
+          const data = {
+            name: document.getElementById("name").value,
+            price: document.getElementById("price").value,
+            countInStock: document.getElementById("stock").value,
+            category: category,
+            image: document.getElementById("image").value,
+            description: document.getElementById("description").value,
+          };
+
+          const res = await fetch(
+            id ? `${API_URL}/products/${id}` : `${API_URL}/products`,
+            {
+              method: id ? "PUT" : "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userInfo.token}`,
+              },
+              body: JSON.stringify(data),
+            },
+          );
+
+          if (res.ok) {
+            resetProductForm();
+            loadProducts();
+          }
+        });
+
+      async function editProduct(id) {
+        const res = await fetch(`${API_URL}/products/${id}`);
+        const p = await res.json();
+        document.getElementById("productId").value = p._id;
+        document.getElementById("name").value = p.name;
+        document.getElementById("price").value = p.price;
+        document.getElementById("stock").value = p.countInStock;
+        document.getElementById("image").value = p.image;
+        document.getElementById("description").value = p.description;
+
+        // Wait for categories to be rendered then check the correct radio
+        setTimeout(() => {
+          document.getElementsByName("category").forEach((r) => {
+            if (r.value === p.category) r.checked = true;
+          });
+        }, 100);
+
+        document.getElementById("prod-form-title").innerText = "Edit Product";
+        document.getElementById("prod-submit-btn").innerText = "Update Product";
+        document.getElementById("prod-cancel-btn").classList.remove("hidden");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function resetProductForm() {
+        document.getElementById("productForm").reset();
+        document.getElementById("productId").value = "";
+        document.getElementById("prod-form-title").innerText =
+          "Product Management";
+        document.getElementById("prod-submit-btn").innerText = "Save Product";
+        document.getElementById("prod-cancel-btn").classList.add("hidden");
+      }
+
+      async function deleteProduct(id) {
+        if (confirm("Delete?")) {
+          await fetch(`${API_URL}/products/${id}`, {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${userInfo.token}` },
+          });
+          loadProducts();
+        }
+      }
+
+      // Update the loadUsers function in admin.html script
+      async function loadUsers() {
+        try {
+          const userRes = await fetch(`${API_URL}/users`, {
+            headers: { Authorization: `Bearer ${userInfo.token}` },
+          });
+          const users = await userRes.json();
+
+          const statsRes = await fetch(`${API_URL}/orders/user-stats`, {
+            headers: { Authorization: `Bearer ${userInfo.token}` },
+          });
+          const stats = await statsRes.json();
+
+          const body = document.getElementById("user-table-body");
+          body.innerHTML = users
+            .map((u) => {
+              const userStat = stats.find((s) => s._id === u._id) || {
+                totalSpent: 0,
+                totalProducts: 0,
+              };
+
+              return `
+            <tr class="hover:bg-gray-50 border-b">
+                <td class="p-5">
+                    <div class="font-bold text-gray-800">${u.name}</div>
+                    <div class="text-xs text-gray-400">${u.email}</div>
+                </td>
+                <td class="p-5 font-black text-blue-600">$${userStat.totalSpent.toFixed(2)}</td>
+                <td class="p-5 text-center font-bold text-gray-600">${userStat.totalProducts}</td>
+                <td class="p-5 text-center">
+                    <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase ${u.isAdmin ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-500"}">
+                        ${u.isAdmin ? "Admin" : "Customer"}
+                    </span>
+                </td>
+                <td class="p-5 text-right">
+                    ${u.isAdmin ? "" : `<button onclick="deleteUser('${u._id}')" class="bg-red-50 text-red-500 p-2 rounded-lg hover:bg-red-500 hover:text-white transition"><i class="fa-solid fa-user-xmark"></i></button>`}
+                </td>
+            </tr>`;
+            })
+            .join("");
+        } catch (err) {
+          console.error("Failed to load user data");
+        }
+      }
+
+      async function deleteUser(id) {
+        if (confirm("Remove User?")) {
+          await fetch(`${API_URL}/users/${id}`, {
+            method: "DELETE",
+            headers: { Authorization: `Bearer ${userInfo.token}` },
+          });
+          loadUsers();
+        }
+      }
+
+      loadCategories();
+      loadProducts();
+      loadUsers();
+    </script>
+  </body>
+</html>

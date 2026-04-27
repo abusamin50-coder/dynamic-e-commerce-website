@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Cart | ProStore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      .status-badge-cart {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        padding: 2px 6px;
+        font-size: 8px;
+        font-weight: 900;
+        text-transform: uppercase;
+        border-radius: 4px;
+        z-index: 20;
+      }
+      .fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+    <!-- NAVBAR -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+      <div
+        class="container mx-auto px-4 py-3 flex items-center justify-between"
+      >
+        <div class="flex items-center gap-4">
+          <button
+            onclick="window.history.back()"
+            class="text-gray-400 hover:text-blue-600 transition text-xl"
+          >
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+          <a href="index.html" class="text-2xl font-bold text-blue-600"
+            >ProStore</a
+          >
+        </div>
+        <div class="flex items-center space-x-6">
+          <a href="cart.html" class="relative text-blue-600">
+            <i class="fa-solid fa-cart-shopping text-xl"></i>
+            <span
+              id="cart-count-nav"
+              class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full hidden"
+              >0</span
+            >
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- CART CONTENT -->
+    <main class="container mx-auto px-4 py-12 flex-grow" id="cart-main-section">
+      <h1 class="text-3xl font-black text-gray-900 mb-8">Shopping Cart</h1>
+      <div id="cart-wrapper" class="flex flex-col lg:flex-row gap-8">
+        <div class="flex-1 space-y-4" id="cart-items-container"></div>
+        <div class="w-full lg:w-96">
+          <div class="bg-white p-8 rounded-2xl border shadow-sm sticky top-24">
+            <h2 class="text-xl font-bold mb-6">Summary</h2>
+            <div
+              class="flex justify-between font-black text-2xl text-gray-900 mb-8"
+            >
+              <span>Total</span><span id="total-price">$0.00</span>
+            </div>
+            <button
+              id="checkout-btn"
+              onclick="proceedToCheckout()"
+              class="w-full bg-blue-600 text-white py-4 rounded-xl font-black hover:bg-blue-700 transition shadow-lg shadow-blue-200"
+            >
+              Proceed to Checkout
+            </button>
+            <p
+              id="stock-warning"
+              class="text-red-500 text-xs mt-4 text-center hidden font-bold"
+            >
+              Remove out of stock items to continue.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div
+        id="empty-cart"
+        class="hidden text-center py-20 bg-white rounded-2xl border"
+      >
+        <i class="fa-solid fa-cart-arrow-down text-4xl text-gray-200 mb-6"></i>
+        <h2 class="text-xl font-bold mb-4">Your cart is empty</h2>
+        <a
+          href="index.html"
+          class="bg-blue-600 text-white px-8 py-3 rounded-lg font-bold"
+          >Go Shopping</a
+        >
+      </div>
+    </main>
+
+    <!-- SUCCESS SCREEN -->
+    <main
+      id="success-screen"
+      class="hidden container mx-auto px-4 py-20 flex-grow text-center fade-in"
+    >
+      <div class="bg-white p-12 rounded-3xl border shadow-sm max-w-2xl mx-auto">
+        <i class="fa-solid fa-circle-check text-green-500 text-6xl mb-6"></i>
+        <h1 class="text-4xl font-black mb-4">Order Placed Successfully!</h1>
+        <p class="text-gray-500 mb-10">
+          We have received your order. Continue shopping for more.
+        </p>
+        <a
+          href="index.html"
+          class="bg-blue-600 text-white px-12 py-4 rounded-full font-black hover:bg-blue-700 transition"
+          >Continue Shopping</a
+        >
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-900 text-white pt-20 pb-10">
+      <div class="container mx-auto px-4 text-center">
+        <a href="index.html" class="text-3xl font-black text-blue-500"
+          >ProStore</a
+        >
+        <p class="mt-4 text-gray-500 text-sm">
+          &copy; 2024 ProStore E-Commerce. All rights reserved.
+        </p>
+      </div>
+    </footer>
+
+    <!-- Inside the script tag, update proceedToCheckout function -->
+    <script>
+      async function proceedToCheckout() {
+        const cartKey = `cart_${userInfo.email}`;
+        const cartItems = JSON.parse(localStorage.getItem(cartKey)) || [];
+        const totalPrice = cartItems.reduce(
+          (acc, item) => acc + item.price * item.qty,
+          0,
+        );
+
+        try {
+          const res = await fetch("http://localhost:5000/api/orders", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${userInfo.token}`,
+            },
+            body: JSON.stringify({ orderItems: cartItems, totalPrice }),
+          });
+
+          if (res.ok) {
+            localStorage.removeItem(cartKey);
+            document
+              .getElementById("cart-main-section")
+              .classList.add("hidden");
+            document
+              .getElementById("success-screen")
+              .classList.remove("hidden");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          } else {
+            alert("Checkout failed. Try again.");
+          }
+        } catch (err) {
+          console.error("Checkout error");
+        }
+      }
+    </script>
+  </body>
+</html>
