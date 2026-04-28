@@ -1,13 +1,18 @@
 {
   "name": "prostore-root",
   "version": "1.0.0",
-  "description": "Root for ProStore E-commerce",
+  "description": "Fullstack Ecommerce",
+  "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",
-    "install-backend": "npm install --prefix backend",
-    "build": "npm run install-backend"
+    "install-all": "npm install && cd backend && npm install"
   },
   "dependencies": {
-    "mongodb": "^7.2.0"
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.5.0"
   }
 }
