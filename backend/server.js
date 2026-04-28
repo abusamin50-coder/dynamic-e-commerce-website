@@ -1,19 +1,19 @@
-const express = require('express');
-const dotenv = require('dotenv');
-const cors = require('cors');
-const path = require('path');
+const express = require("express");
+const dotenv = require("dotenv");
+const cors = require("cors");
+const path = require("path");
 
 // Load env variables (Path specify করে দেওয়া ভালো)
-dotenv.config({ path: path.join(__dirname, '.env') });
+dotenv.config({ path: path.join(__dirname, ".env") });
 
 // DB connect
-const connectDB = require('./config/db');
+const connectDB = require("./config/db");
 
 // Routes
-const userRoutes = require('./routes/userRoutes');
-const productRoutes = require('./routes/productRoutes');
-const categoryRoutes = require('./routes/categoryRoutes');
-const orderRoutes = require('./routes/orderRoutes');
+const userRoutes = require("./routes/userRoutes");
+const productRoutes = require("./routes/productRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 
 // Connect Database
 connectDB();
@@ -26,32 +26,41 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // --- API Routes ---
-app.use('/api/users', userRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/orders', orderRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/orders", orderRoutes);
 
 // --- Static Files & Frontend Serving ---
-const frontendPath = path.join(__dirname, '../frontend');
+const frontendPath = path.join(__dirname, "../frontend");
 app.use(express.static(frontendPath));
 
 // সব নন-এপিআই রিকোয়েস্টের জন্য index.html পাঠানো
-app.get('*', (req, res) => {
-    // API call না হলে index.html দেখাবে
-    if (!req.url.startsWith('/api')) {
-        res.sendFile(path.join(frontendPath, 'index.html'));
-    }
+app.get("*", (req, res) => {
+  // API call না হলে index.html দেখাবে
+  if (!req.url.startsWith("/api")) {
+    res.sendFile(path.join(frontendPath, "index.html"));
+  }
 });
 
 // Global Error Handler (Render এ এরর ডিবাগ করতে সাহায্য করবে)
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send({ message: 'Something went wrong!' });
+  console.error(err.stack);
+  res.status(500).send({ message: "Something went wrong!" });
 });
 
-// PORT (Render compatible)
-const PORT = process.env.PORT || 5001;
+// Updated Port Logic
+const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+const server = app
+  .listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
-});
+  })
+  .on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      console.log(`⚠️ Port ${PORT} is busy, trying ${Number(PORT) + 1}...`);
+      server.listen(Number(PORT) + 1);
+    } else {
+      console.error(err);
+    }
+  });
