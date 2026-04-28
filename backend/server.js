@@ -10,10 +10,10 @@ dotenv.config();
 const connectDB = require('./config/db');
 
 // Routes
-const userRoutes = require('./routes/userRoutes');
-const productRoutes = require('./routes/productRoutes');
-const categoryRoutes = require('./routes/categoryRoutes');
-const orderRoutes = require('./routes/orderRoutes');
+const userRoutes = require('../routes/userRoutes');
+const productRoutes = require('../routes/productRoutes');
+const categoryRoutes = require('../routes/categoryRoutes');
+const orderRoutes = require('../routes/orderRoutes');
 
 // Connect Database
 connectDB();
@@ -31,24 +31,23 @@ app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/orders', orderRoutes);
 
-// --- Serving Vanilla Frontend Files ---
-// path.resolve() প্রজেক্টের রুট ডিরেক্টরি (MY-ECOMMERCE) খুঁজে বের করবে
-const rootDir = path.resolve();
+// --- Static Files & Frontend Routing ---
 
-// Static Folder হিসেবে frontend ফোল্ডারকে চিনিয়ে দেওয়া
-app.use(express.static(path.join(rootDir, 'frontend')));
+// Identify the absolute path to the frontend folder
+const frontendPath = path.join(__dirname, '..', 'frontend');
 
-// যদি এনভায়রনমেন্ট প্রোডাকশন হয় তবে ইনডেক্স ফাইল দেখানো
-if (process.env.NODE_ENV === 'production') {
-    app.get('*', (req, res) => {
-        res.sendFile(path.resolve(rootDir, 'frontend', 'index.html'));
-    });
-} else {
-    // লোকাল হোস্টে টেস্ট করার জন্য
-    app.get('/', (req, res) => {
-        res.send('ProStore API is Running in Development...');
-    });
-}
+// Serve all static files (CSS, JS, Images) from the frontend folder
+app.use(express.static(frontendPath));
+
+// Serve index.html for the root route and all other non-API routes
+app.get('*', (req, res) => {
+    // Check if the request is an API call; if not, send the index.html
+    if (!req.url.startsWith('/api')) {
+        res.sendFile(path.join(frontendPath, 'index.html'));
+    } else {
+        res.status(404).json({ message: "API endpoint not found" });
+    }
+});
 
 // PORT (Render compatible)
 const PORT = process.env.PORT || 5000;
