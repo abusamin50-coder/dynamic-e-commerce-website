@@ -3,13 +3,13 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
 
-// Load env variables
-dotenv.config();
+// Load env variables (Path specify করে দেওয়া ভালো)
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 // DB connect
 const connectDB = require('./config/db');
 
-// Routes (এখানে আমি পাথগুলো ঠিক করে দিয়েছি)
+// Routes
 const userRoutes = require('./routes/userRoutes');
 const productRoutes = require('./routes/productRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
@@ -25,27 +25,28 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// API Routes
+// --- API Routes ---
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/orders', orderRoutes);
 
 // --- Static Files & Frontend Serving ---
-
-// backend ফোল্ডার থেকে এক ধাপ বাইরে গিয়ে frontend ফোল্ডার খুঁজে বের করা
 const frontendPath = path.join(__dirname, '../frontend');
-
-// static folder হিসেবে frontend কে সেট করা
 app.use(express.static(frontendPath));
 
 // সব নন-এপিআই রিকোয়েস্টের জন্য index.html পাঠানো
 app.get('*', (req, res) => {
+    // API call না হলে index.html দেখাবে
     if (!req.url.startsWith('/api')) {
         res.sendFile(path.join(frontendPath, 'index.html'));
-    } else {
-        res.status(404).json({ message: "API endpoint not found" });
     }
+});
+
+// Global Error Handler (Render এ এরর ডিবাগ করতে সাহায্য করবে)
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send({ message: 'Something went wrong!' });
 });
 
 // PORT (Render compatible)

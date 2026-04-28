@@ -274,7 +274,7 @@
       // --- NEW DYNAMIC CATEGORY FETCH ---
       async function fetchCategories() {
         try {
-          const res = await fetch("http://localhost:5000/api/categories");
+          const res = await fetch(`${window.API_URL}/categories`);
           const categories = await res.json();
           const container = document.getElementById("dynamic-categories");
 
