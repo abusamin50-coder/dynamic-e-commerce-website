@@ -166,11 +166,11 @@
                 class="bg-gray-50 text-[10px] font-black text-gray-400 uppercase"
               >
                 <tr>
-                  <th class="p-5 border-b">Product</th>
-                  <th class="p-5 border-b">Price</th>
-                  <th class="p-5 border-b">Category</th>
-                  <th class="p-5 border-b">Status</th>
-                  <th class="p-5 border-b">Action</th>
+                  <th class="p-5 border-b">User Info</th>
+                  <th class="p-5 border-b">Total Spent</th>
+                  <th class="p-5 border-b text-center">Total Products</th>
+                  <th class="p-5 border-b text-center">Role</th>
+                  <th class="p-5 border-b text-right">Action</th>
                 </tr>
               </thead>
               <tbody id="product-table-body"></tbody>
@@ -379,32 +379,66 @@
       }
 
       // --- PRODUCT LOGIC ---
+      // --- PRODUCT LOGIC (Fixed & Robust) ---
       async function loadProducts() {
-        const res = await fetch(`${API_URL}/products`);
-        let products = await res.json();
-        products.sort((a, b) => (b.countInStock > 0) - (a.countInStock > 0));
+        console.log("Attempting to load products from:", `${API_URL}/products`); // Debugging Line
 
         const body = document.getElementById("product-table-body");
-        body.innerHTML = products
-          .map((p) => {
-            const isOutOfStock = p.countInStock <= 0;
-            return `
+        body.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-blue-600"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading inventory...</td></tr>`;
+
+        try {
+          const res = await fetch(`${API_URL}/products`);
+
+          if (!res.ok) {
+            throw new Error(`Server responded with status: ${res.status}`);
+          }
+
+          const products = await res.json();
+          console.log("Products received:", products); // Debugging Line
+
+          if (!products || products.length === 0) {
+            body.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-gray-400 italic">No products published yet. Please add one above.</td></tr>`;
+            return;
+          }
+
+          // Sort: Latest products first or In-stock first
+          products.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+          );
+
+          body.innerHTML = products
+            .map((p) => {
+              const isOutOfStock = p.countInStock <= 0;
+              return `
                 <tr class="hover:bg-gray-50 transition border-b">
-                    <td class="p-5 font-bold text-gray-800">${p.name}</td>
+                    <td class="p-5 font-bold text-gray-800">
+                        <div class="flex items-center gap-3">
+                            <img src="${p.image}" class="w-8 h-8 object-cover rounded shadow-sm" onerror="this.src='https://placehold.co/50x50?text=No+Image'">
+                            <span>${p.name}</span>
+                        </div>
+                    </td>
                     <td class="p-5 font-black text-blue-600">$${p.price}</td>
-                    <td class="p-5 text-xs font-bold uppercase text-gray-400">${p.category}</td>
+                    <td class="p-5 text-xs font-bold uppercase text-gray-400">${p.category || "No Category"}</td>
                     <td class="p-5">
                         <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase ${isOutOfStock ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600"}">
                             ${isOutOfStock ? "Out of Stock" : "In Stock (" + p.countInStock + ")"}
                         </span>
                     </td>
-                    <td class="p-5 space-x-3">
-                        <button onclick="editProduct('${p._id}')" class="text-blue-500 hover:scale-110 transition"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button onclick="deleteProduct('${p._id}')" class="text-red-500 hover:scale-110 transition"><i class="fa-solid fa-trash-can"></i></button>
+                    <td class="p-5 space-x-4 text-right">
+                        <button onclick="editProduct('${p._id}')" class="text-blue-500 hover:text-blue-700 transition text-lg" title="Edit">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button onclick="deleteProduct('${p._id}')" class="text-red-500 hover:text-red-700 transition text-lg" title="Delete">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
                     </td>
                 </tr>`;
-          })
-          .join("");
+            })
+            .join("");
+        } catch (err) {
+          console.error("Critical Error loading products:", err);
+          body.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-red-500 font-bold">Failed to load products. Error: ${err.message}</td></tr>`;
+        }
       }
 
       document

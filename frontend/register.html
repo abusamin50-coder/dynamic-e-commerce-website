@@ -5,135 +5,148 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Register | ProStore</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- config.js পাথ ঠিক আছে কি না নিশ্চিত করুন -->
     <script src="assets/js/config.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+      #toast {
+        transform: translateX(120%);
+        transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        z-index: 1000;
+      }
+      #toast.show {
+        transform: translateX(0);
+      }
+    </style>
   </head>
   <body class="bg-gray-100 h-screen flex items-center justify-center">
+    
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-900 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4">
+      <div id="toast-icon-bg" class="bg-blue-600 w-8 h-8 rounded-full flex items-center justify-center">
+        <i id="toast-icon" class="fa-solid fa-check text-xs"></i>
+      </div>
+      <div>
+        <p id="toast-title" class="font-bold text-sm">Notification</p>
+        <p id="toast-msg" class="text-xs opacity-90"></p>
+      </div>
+    </div>
+
     <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
       <div class="text-center mb-8">
-        <a href="index.html" class="text-3xl font-bold text-blue-600"
-          >ProStore</a
-        >
+        <a href="index.html" class="text-3xl font-bold text-blue-600">ProStore</a>
         <p class="text-gray-500 mt-2">Create an account to start shopping.</p>
       </div>
 
       <form id="registerForm" class="space-y-5">
         <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-1"
-            >Full Name</label
-          >
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Full Name</label>
           <div class="relative">
-            <span class="absolute left-3 top-3 text-gray-400"
-              ><i class="fa-solid fa-user"></i
-            ></span>
-            <input
-              type="text"
-              id="name"
-              placeholder="John Doe"
-              class="w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-              required
-            />
+            <span class="absolute left-3 top-3 text-gray-400"><i class="fa-solid fa-user"></i></span>
+            <input type="text" id="name" placeholder="John Doe" class="w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition" required />
           </div>
         </div>
 
         <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-1"
-            >Email Address</label
-          >
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Email Address</label>
           <div class="relative">
-            <span class="absolute left-3 top-3 text-gray-400"
-              ><i class="fa-solid fa-envelope"></i
-            ></span>
-            <input
-              type="email"
-              id="email"
-              placeholder="name@example.com"
-              class="w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-              required
-            />
+            <span class="absolute left-3 top-3 text-gray-400"><i class="fa-solid fa-envelope"></i></span>
+            <input type="email" id="email" placeholder="name@example.com" class="w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition" required />
           </div>
         </div>
 
         <div>
-          <label class="block text-sm font-semibold text-gray-700 mb-1"
-            >Password</label
-          >
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Password</label>
           <div class="relative">
-            <span class="absolute left-3 top-3 text-gray-400"
-              ><i class="fa-solid fa-lock"></i
-            ></span>
-            <input
-              type="password"
-              id="password"
-              placeholder="••••••••"
-              class="w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-              required
-            />
+            <span class="absolute left-3 top-3 text-gray-400"><i class="fa-solid fa-lock"></i></span>
+            <input type="password" id="password" placeholder="••••••••" class="w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 transition" required />
           </div>
         </div>
 
-        <button
-          type="submit"
-          class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200"
-        >
-          Create Account
+        <button type="submit" id="submitBtn" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200 flex justify-center items-center">
+          <span id="btnText">Create Account</span>
         </button>
       </form>
 
       <p class="text-center mt-8 text-gray-600">
-        Already have an account?
-        <a href="login.html" class="text-blue-600 font-bold hover:underline"
-          >Login</a
-        >
+        Already have an account? <a href="login.html" class="text-blue-600 font-bold hover:underline">Login</a>
       </p>
 
       <div class="mt-6 text-center">
-        <a href="index.html" class="text-sm text-gray-400 hover:text-gray-600"
-          ><i class="fa-solid fa-arrow-left mr-1"></i> Back to Home</a
-        >
+        <a href="index.html" class="text-sm text-gray-400 hover:text-gray-600"><i class="fa-solid fa-arrow-left mr-1"></i> Back to Home</a>
       </div>
     </div>
 
     <script>
-      // window.API_URL আমাদের assets/js/config.js থেকে আসছে
-      const API_ENDPOINT = `${window.API_URL}/users/register`;
+      function showNotification(msg, isError = false) {
+        const toast = document.getElementById("toast");
+        const iconBg = document.getElementById("toast-icon-bg");
+        const icon = document.getElementById("toast-icon");
+        const title = document.getElementById("toast-title");
+        const msgEl = document.getElementById("toast-msg");
 
-      document
-        .getElementById("registerForm")
-        .addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const name = document.getElementById("name").value;
-          const email = document.getElementById("email").value;
-          const password = document.getElementById("password").value;
+        if (isError) {
+          iconBg.classList.replace("bg-blue-600", "bg-red-600");
+          icon.classList.replace("fa-check", "fa-xmark");
+          title.innerText = "Error";
+        } else {
+          iconBg.classList.replace("bg-red-600", "bg-blue-600");
+          icon.classList.replace("fa-xmark", "fa-check");
+          title.innerText = "Success";
+        }
 
-          try {
-            // dynamic API_ENDPOINT ব্যবহার করছি
-            const response = await fetch(API_ENDPOINT, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ name, email, password }),
-            });
+        msgEl.innerText = msg;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 4000);
+      }
 
-            const data = await response.json();
+      document.getElementById("registerForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        const submitBtn = document.getElementById("submitBtn");
+        const btnText = document.getElementById("btnText");
+        
+        // লোডিং স্টেট
+        submitBtn.disabled = true;
+        btnText.innerText = "Processing...";
 
-            if (response.ok) {
-              localStorage.setItem("userInfo", JSON.stringify(data));
-              alert("Registration Successful!");
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        // URL Safety: config.js না থাকলে রিলেটিভ পাথ ব্যবহার করবে
+        const baseUrl = window.API_URL || '/api';
+        const API_ENDPOINT = `${baseUrl}/users/register`;
+
+        try {
+          const response = await fetch(API_ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, password }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            localStorage.setItem("userInfo", JSON.stringify(data));
+            showNotification("Account created successfully! Redirecting...");
+            
+            // ২ সেকেন্ড পর রিডাইরেক্ট
+            setTimeout(() => {
               window.location.href = "index.html";
-            } else {
-              alert(data.message || "Registration failed.");
-            }
-          } catch (error) {
-            console.error("Error:", error);
-            // যদি এই এলার্টটি আসে, তার মানে config.js ঠিকমতো লোড হয়নি অথবা URL ভুল
-            alert(
-              "Connection to server failed. Please check if you updated the URL.",
-            );
+            }, 2000);
+          } else {
+            showNotification(data.message || "Registration failed.", true);
+            submitBtn.disabled = false;
+            btnText.innerText = "Create Account";
           }
-        });
+        } catch (error) {
+          console.error("Network Error:", error);
+          showNotification("Server connection failed. Please try again later.", true);
+          submitBtn.disabled = false;
+          btnText.innerText = "Create Account";
+        }
+      });
     </script>
   </body>
 </html>
