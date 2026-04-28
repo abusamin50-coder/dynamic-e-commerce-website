@@ -1,3 +1,11 @@
+require("dotenv").config();
+
+console.log("MONGO_URI:", process.env.MONGO_URI); // 👈 এখানে দাও
+
+const express = require("express");
+const mongoose = require("mongoose");
+
+
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');

@@ -7,5 +7,8 @@
     "dev": "npm run dev --prefix backend",
     "install-backend": "cd backend && npm install",
     "build": "npm run install-backend"
+  },
+  "dependencies": {
+    "mongodb": "^7.2.0"
   }
 }
