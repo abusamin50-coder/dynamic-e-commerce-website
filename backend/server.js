@@ -9,11 +9,11 @@ dotenv.config();
 // DB connect
 const connectDB = require('./config/db');
 
-// Routes
-const userRoutes = require('../routes/userRoutes');
-const productRoutes = require('../routes/productRoutes');
-const categoryRoutes = require('../routes/categoryRoutes');
-const orderRoutes = require('../routes/orderRoutes');
+// Routes (এখানে আমি পাথগুলো ঠিক করে দিয়েছি)
+const userRoutes = require('./routes/userRoutes');
+const productRoutes = require('./routes/productRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
+const orderRoutes = require('./routes/orderRoutes');
 
 // Connect Database
 connectDB();
@@ -31,17 +31,16 @@ app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/orders', orderRoutes);
 
-// --- Static Files & Frontend Routing ---
+// --- Static Files & Frontend Serving ---
 
-// Identify the absolute path to the frontend folder
-const frontendPath = path.join(__dirname, '..', 'frontend');
+// backend ফোল্ডার থেকে এক ধাপ বাইরে গিয়ে frontend ফোল্ডার খুঁজে বের করা
+const frontendPath = path.join(__dirname, '../frontend');
 
-// Serve all static files (CSS, JS, Images) from the frontend folder
+// static folder হিসেবে frontend কে সেট করা
 app.use(express.static(frontendPath));
 
-// Serve index.html for the root route and all other non-API routes
+// সব নন-এপিআই রিকোয়েস্টের জন্য index.html পাঠানো
 app.get('*', (req, res) => {
-    // Check if the request is an API call; if not, send the index.html
     if (!req.url.startsWith('/api')) {
         res.sendFile(path.join(frontendPath, 'index.html'));
     } else {
