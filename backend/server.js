@@ -32,20 +32,23 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/orders', orderRoutes);
 
 // --- Serving Vanilla Frontend Files ---
-const __dirname1 = path.resolve();
+// path.resolve() প্রজেক্টের রুট ডিরেক্টরি (MY-ECOMMERCE) খুঁজে বের করবে
+const rootDir = path.resolve();
 
-// This tells Express to serve all files (CSS, JS, Images) from the frontend folder
-app.use(express.static(path.join(__dirname1, 'frontend')));
+// Static Folder হিসেবে frontend ফোল্ডারকে চিনিয়ে দেওয়া
+app.use(express.static(path.join(rootDir, 'frontend')));
 
-// Handle the home page
-app.get('/', (req, res) => {
-    res.sendFile(path.resolve(__dirname1, 'frontend', 'index.html'));
-});
-
-// Handle any other page (like /login or /cart)
-app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname1, 'frontend', 'index.html'));
-});
+// যদি এনভায়রনমেন্ট প্রোডাকশন হয় তবে ইনডেক্স ফাইল দেখানো
+if (process.env.NODE_ENV === 'production') {
+    app.get('*', (req, res) => {
+        res.sendFile(path.resolve(rootDir, 'frontend', 'index.html'));
+    });
+} else {
+    // লোকাল হোস্টে টেস্ট করার জন্য
+    app.get('/', (req, res) => {
+        res.send('ProStore API is Running in Development...');
+    });
+}
 
 // PORT (Render compatible)
 const PORT = process.env.PORT || 5000;
