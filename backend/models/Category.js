@@ -11,5 +11,7 @@ const categorySchema = new mongoose.Schema({
     timestamps: true
 });
 
-const Category = mongoose.model('Category', categorySchema);
+// Use existing model if it exists, otherwise create a new one
+const Category = mongoose.models.Category || mongoose.model('Category', categorySchema);
+
 module.exports = Category;

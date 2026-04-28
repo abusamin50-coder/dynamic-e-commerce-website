@@ -16,10 +16,11 @@ const addOrderItems = async (req, res) => {
             });
 
             const createdOrder = await order.save();
-            res.status(201).json(createdOrder);
+            return res.status(201).json(createdOrder);
         }
     } catch (error) {
-        res.status(500).json({ message: 'Order creation failed' });
+        console.error(`Order Creation Error: ${error.message}`);
+        return res.status(500).json({ message: 'Order creation failed' });
     }
 };
 
@@ -36,9 +37,10 @@ const getUserStats = async (req, res) => {
                 }
             }
         ]);
-        res.json(stats);
+        return res.json(stats);
     } catch (error) {
-        res.status(500).json({ message: 'Failed to fetch stats' });
+        console.error(`Stats Fetch Error: ${error.message}`);
+        return res.status(500).json({ message: 'Failed to fetch stats' });
     }
 };
 

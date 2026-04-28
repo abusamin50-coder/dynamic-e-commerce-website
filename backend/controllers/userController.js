@@ -10,13 +10,16 @@ const generateToken = (id) => {
 const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    
     const userExists = await User.findOne({ email });
-    if (userExists)
+    if (userExists) {
       return res.status(400).json({ message: "User already exists" });
+    }
 
     const user = await User.create({ name, email, password });
+    
     if (user) {
-      res.status(201).json({
+      return res.status(201).json({
         _id: user._id,
         name: user.name,
         email: user.email,
@@ -24,10 +27,11 @@ const registerUser = async (req, res) => {
         token: generateToken(user._id),
       });
     } else {
-      res.status(400).json({ message: "Invalid user data" });
+      return res.status(400).json({ message: "Invalid user data" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Server Error" });
+    console.error(`Register Error: ${error.message}`);
+    return res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
 
@@ -36,8 +40,9 @@ const authUser = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
+
     if (user && (await user.matchPassword(password))) {
-      res.json({
+      return res.json({
         _id: user._id,
         name: user.name,
         email: user.email,
@@ -45,10 +50,11 @@ const authUser = async (req, res) => {
         token: generateToken(user._id),
       });
     } else {
-      res.status(401).json({ message: "Invalid email or password" });
+      return res.status(401).json({ message: "Invalid email or password" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Server Error" });
+    console.error(`Login Error: ${error.message}`);
+    return res.status(500).json({ message: "Server Error" });
   }
 };
 
@@ -57,22 +63,21 @@ const getUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     if (user) {
-      res.json({
+      return res.json({
         _id: user._id,
         name: user.name,
         email: user.email,
         isAdmin: user.isAdmin,
       });
     } else {
-      res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Server Error" });
+    return res.status(500).json({ message: "Server Error" });
   }
 };
 
 // @desc    Update user profile
-// @route   PUT /api/users/profile
 const updateUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
@@ -82,20 +87,16 @@ const updateUserProfile = async (req, res) => {
 
       // Password update logic
       if (req.body.newPassword) {
-        // Check if current password matches
         const isMatch = await user.matchPassword(req.body.currentPassword);
         if (!isMatch) {
-          return res
-            .status(401)
-            .json({ message: "Current password is incorrect" });
+          return res.status(401).json({ message: "Current password is incorrect" });
         }
         user.password = req.body.newPassword;
       }
 
       const updatedUser = await user.save();
 
-      // SEND NEW TOKEN BACK TO FRONTEND
-      res.json({
+      return res.json({
         _id: updatedUser._id,
         name: updatedUser.name,
         email: updatedUser.email,
@@ -103,10 +104,11 @@ const updateUserProfile = async (req, res) => {
         token: generateToken(updatedUser._id),
       });
     } else {
-      res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Server error during update" });
+    console.error(`Update Error: ${error.message}`);
+    return res.status(500).json({ message: "Server error during update" });
   }
 };
 
@@ -114,9 +116,9 @@ const updateUserProfile = async (req, res) => {
 const getUsers = async (req, res) => {
   try {
     const users = await User.find({});
-    res.json(users);
+    return res.json(users);
   } catch (error) {
-    res.status(500).json({ message: "Server Error" });
+    return res.status(500).json({ message: "Server Error" });
   }
 };
 
@@ -126,12 +128,12 @@ const deleteUser = async (req, res) => {
     const user = await User.findById(req.params.id);
     if (user) {
       await user.deleteOne();
-      res.json({ message: "User removed" });
+      return res.json({ message: "User removed" });
     } else {
-      res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Server Error" });
+    return res.status(500).json({ message: "Server Error" });
   }
 };
 

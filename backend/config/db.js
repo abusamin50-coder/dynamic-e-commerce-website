@@ -2,22 +2,19 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
     try {
-        // Check for common variable name variations
-        const uri = process.env.MONGO_URI || process.env.MONGODB_URI;
+        const uri = process.env.MONGO_URI;
 
         if (!uri) {
-            console.log("------------------------------------------");
-            console.error('❌ ERROR: MONGO_URI is MISSING in your .env file!');
-            console.log("Checking current Directory:", process.cwd());
-            console.log("------------------------------------------");
+            console.error('❌ MONGO_URI is missing in .env');
             process.exit(1);
         }
 
+        // In Mongoose 7, we don't need useNewUrlParser or useUnifiedTopology
         const conn = await mongoose.connect(uri);
+
         console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
     } catch (error) {
-        console.error(`❌ Database Connection Error: ${error.message}`);
-        // If it's a whitelist error, this message will explain it
+        console.error(`❌ Database Error: ${error.message}`);
         process.exit(1);
     }
 };

@@ -16,5 +16,7 @@ const orderSchema = new mongoose.Schema({
     timestamps: true
 });
 
-const Order = mongoose.model('Order', orderSchema);
+// Use existing model if it exists, otherwise create a new one
+const Order = mongoose.models.Order || mongoose.model('Order', orderSchema);
+
 module.exports = Order;

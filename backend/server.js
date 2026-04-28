@@ -1,44 +1,54 @@
-require("dotenv").config();
-
-console.log("MONGO_URI:", process.env.MONGO_URI); // 👈 এখানে দাও
-
-const express = require("express");
-const mongoose = require("mongoose");
-
-
 const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const path = require('path');
 
-// Load environment variables
+// Load env variables
 dotenv.config();
-dotenv.config({ path: path.join(__dirname, '../.env') });
 
-const connectDB = require('./config/db.js');
+// DB connect
+const connectDB = require('./config/db');
+
+// Routes
 const userRoutes = require('./routes/userRoutes');
 const productRoutes = require('./routes/productRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 
+// Connect Database
 connectDB();
 
 const app = express();
+
+// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
+// API Routes
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/orders', orderRoutes);
 
-app.get('/', (req, res) => res.send('ProStore API is Running...'));
+// --- Serving Vanilla Frontend Files ---
+const __dirname1 = path.resolve();
 
-// THIS IS THE FIX: Render provides a dynamic PORT. 
-// Locally, we use 5050 to avoid the "Already in use" error.
-const PORT = process.env.PORT || 5050;
+// This tells Express to serve all files (CSS, JS, Images) from the frontend folder
+app.use(express.static(path.join(__dirname1, 'frontend')));
+
+// Handle the home page
+app.get('/', (req, res) => {
+    res.sendFile(path.resolve(__dirname1, 'frontend', 'index.html'));
+});
+
+// Handle any other page (like /login or /cart)
+app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname1, 'frontend', 'index.html'));
+});
+
+// PORT (Render compatible)
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);

@@ -6,9 +6,10 @@ const Product = require('../models/Product');
 const getCategories = async (req, res) => {
     try {
         const categories = await Category.find({});
-        res.json(categories);
+        return res.json(categories);
     } catch (error) {
-        res.status(500).json({ message: 'Server Error' });
+        console.error(`GetCategories Error: ${error.message}`);
+        return res.status(500).json({ message: 'Server Error' });
     }
 };
 
@@ -24,9 +25,10 @@ const createCategory = async (req, res) => {
         }
 
         const category = await Category.create({ name });
-        res.status(201).json(category);
+        return res.status(201).json(category);
     } catch (error) {
-        res.status(500).json({ message: 'Server Error' });
+        console.error(`CreateCategory Error: ${error.message}`);
+        return res.status(500).json({ message: 'Server Error' });
     }
 };
 
@@ -46,12 +48,13 @@ const updateCategory = async (req, res) => {
             // SYNC LOGIC: Update all products using this category
             await Product.updateMany({ category: oldName }, { category: newName });
 
-            res.json(updatedCategory);
+            return res.json(updatedCategory);
         } else {
-            res.status(404).json({ message: 'Category not found' });
+            return res.status(404).json({ message: 'Category not found' });
         }
     } catch (error) {
-        res.status(500).json({ message: 'Server Error' });
+        console.error(`UpdateCategory Error: ${error.message}`);
+        return res.status(500).json({ message: 'Server Error' });
     }
 };
 
@@ -62,12 +65,13 @@ const deleteCategory = async (req, res) => {
         const category = await Category.findById(req.params.id);
         if (category) {
             await category.deleteOne();
-            res.json({ message: 'Category removed' });
+            return res.json({ message: 'Category removed' });
         } else {
-            res.status(404).json({ message: 'Category not found' });
+            return res.status(404).json({ message: 'Category not found' });
         }
     } catch (error) {
-        res.status(500).json({ message: 'Server Error' });
+        console.error(`DeleteCategory Error: ${error.message}`);
+        return res.status(500).json({ message: 'Server Error' });
     }
 };
 

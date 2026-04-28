@@ -1,9 +1,15 @@
 const express = require('express');
-const router = express.Router();
-const { addOrderItems, getUserStats } = require('../controllers/orderController');
+const { 
+    addOrderItems, 
+    getUserStats 
+} = require('../controllers/orderController');
 const { protect, admin } = require('../middleware/authMiddleware');
+const router = express.Router();
 
-router.route('/').post(protect, addOrderItems);
-router.route('/user-stats').get(protect, admin, getUserStats);
+// User route (Protected)
+router.post('/', protect, addOrderItems);
+
+// Admin route for stats
+router.get('/user-stats', protect, admin, getUserStats);
 
 module.exports = router;
