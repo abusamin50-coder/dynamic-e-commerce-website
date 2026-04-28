@@ -166,14 +166,13 @@
                 class="bg-gray-50 text-[10px] font-black text-gray-400 uppercase"
               >
                 <tr>
-                  <th class="p-5 border-b">Product</th>
-                  <th class="p-5 border-b">Price</th>
-                  <th class="p-5 border-b">Category</th>
-                  <th class="p-5 border-b">Status</th>
-                  <th class="p-5 border-b">Action</th>
+                  <th class="p-5 border-b">User Info</th>
+                  <th class="p-5 border-b">Total Spent</th>
+                  <th class="p-5 border-b text-center">Products</th>
+                  <th class="p-5 border-b text-center">Role</th>
+                  <th class="p-5 border-b text-right">Action</th>
                 </tr>
               </thead>
-              <tbody id="product-table-body"></tbody>
             </table>
           </div>
         </div>
@@ -261,7 +260,8 @@
 
     <script>
       const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-      const API_URL = "http://localhost:5000/api";
+      // Use the dynamic URL from config.js
+      const API_URL = window.API_URL;
 
       if (!userInfo || !userInfo.isAdmin) window.location.href = "login.html";
 
@@ -285,23 +285,21 @@
         const res = await fetch(`${API_URL}/categories`);
         const categories = await res.json();
 
-        // 1. Render Table
         const body = document.getElementById("category-table-body");
         body.innerHTML = categories
           .map(
             (c) => `
-                <tr class="hover:bg-gray-50 transition border-b">
-                    <td class="p-5 font-bold text-gray-800">${c.name}</td>
-                    <td class="p-5 text-right space-x-2">
-                        <button onclick="editCategory('${c._id}', '${c.name}')" class="text-blue-500 hover:text-blue-700 font-bold text-xs uppercase">Rename</button>
-                        <button onclick="deleteCategory('${c._id}')" class="text-red-500 hover:text-red-700 font-bold text-xs uppercase">Delete</button>
-                    </td>
-                </tr>
-            `,
+            <tr class="hover:bg-gray-50 transition border-b">
+                <td class="p-5 font-bold text-gray-800">${c.name}</td>
+                <td class="p-5 text-right space-x-2">
+                    <button onclick="editCategory('${c._id}', '${c.name}')" class="text-blue-500 hover:text-blue-700 font-bold text-xs uppercase">Rename</button>
+                    <button onclick="deleteCategory('${c._id}')" class="text-red-500 hover:text-red-700 font-bold text-xs uppercase">Delete</button>
+                </td>
+            </tr>
+        `,
           )
           .join("");
 
-        // 2. Render Product Form Radios
         const radioContainer = document.getElementById(
           "dynamic-category-radios",
         );
@@ -312,10 +310,10 @@
           radioContainer.innerHTML = categories
             .map(
               (c) => `
-                    <label class="flex items-center gap-2 cursor-pointer bg-white px-4 py-2 rounded-lg border hover:border-blue-400 transition font-bold text-sm">
-                        <input type="radio" name="category" value="${c.name}" required> ${c.name}
-                    </label>
-                `,
+                <label class="flex items-center gap-2 cursor-pointer bg-white px-4 py-2 rounded-lg border hover:border-blue-400 transition font-bold text-sm">
+                    <input type="radio" name="category" value="${c.name}" required> ${c.name}
+                </label>
+            `,
             )
             .join("");
         }
@@ -458,7 +456,6 @@
         document.getElementById("image").value = p.image;
         document.getElementById("description").value = p.description;
 
-        // Wait for categories to be rendered then check the correct radio
         setTimeout(() => {
           document.getElementsByName("category").forEach((r) => {
             if (r.value === p.category) r.checked = true;
@@ -490,7 +487,6 @@
         }
       }
 
-      // Update the loadUsers function in admin.html script
       async function loadUsers() {
         try {
           const userRes = await fetch(`${API_URL}/users`, {
@@ -510,24 +506,23 @@
                 totalSpent: 0,
                 totalProducts: 0,
               };
-
               return `
-            <tr class="hover:bg-gray-50 border-b">
-                <td class="p-5">
-                    <div class="font-bold text-gray-800">${u.name}</div>
-                    <div class="text-xs text-gray-400">${u.email}</div>
-                </td>
-                <td class="p-5 font-black text-blue-600">$${userStat.totalSpent.toFixed(2)}</td>
-                <td class="p-5 text-center font-bold text-gray-600">${userStat.totalProducts}</td>
-                <td class="p-5 text-center">
-                    <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase ${u.isAdmin ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-500"}">
-                        ${u.isAdmin ? "Admin" : "Customer"}
-                    </span>
-                </td>
-                <td class="p-5 text-right">
-                    ${u.isAdmin ? "" : `<button onclick="deleteUser('${u._id}')" class="bg-red-50 text-red-500 p-2 rounded-lg hover:bg-red-500 hover:text-white transition"><i class="fa-solid fa-user-xmark"></i></button>`}
-                </td>
-            </tr>`;
+                <tr class="hover:bg-gray-50 border-b">
+                    <td class="p-5">
+                        <div class="font-bold text-gray-800">${u.name}</div>
+                        <div class="text-xs text-gray-400">${u.email}</div>
+                    </td>
+                    <td class="p-5 font-black text-blue-600">$${userStat.totalSpent.toFixed(2)}</td>
+                    <td class="p-5 text-center font-bold text-gray-600">${userStat.totalProducts}</td>
+                    <td class="p-5 text-center">
+                        <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase ${u.isAdmin ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-500"}">
+                            ${u.isAdmin ? "Admin" : "Customer"}
+                        </span>
+                    </td>
+                    <td class="p-5 text-right">
+                        ${u.isAdmin ? "" : `<button onclick="deleteUser('${u._id}')" class="bg-red-50 text-red-500 p-2 rounded-lg hover:bg-red-500 hover:text-white transition"><i class="fa-solid fa-user-xmark"></i></button>`}
+                    </td>
+                </tr>`;
             })
             .join("");
         } catch (err) {

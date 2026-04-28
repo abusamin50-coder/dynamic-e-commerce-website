@@ -77,68 +77,75 @@
     </div>
 
     <script>
-        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-        const API_URL = 'http://localhost:5000/api/users';
-        if (!userInfo) window.location.href = 'login.html';
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    // Use the dynamic URL from config.js
+    const API_URL = window.API_URL;
 
-        function initProfile() {
-            document.getElementById('display-name').innerText = userInfo.name;
-            document.getElementById('userName').value = userInfo.name;
-            document.getElementById('userEmail').value = userInfo.email;
-            const badge = document.getElementById('user-role-badge');
-            if(userInfo.isAdmin) {
-                badge.innerText = "Admin";
-                badge.className += " bg-blue-600 text-white border-blue-600";
-                document.getElementById('admin-management-card').classList.remove('hidden');
-            } else {
-                badge.innerText = "User";
-                badge.className += " bg-gray-100 text-gray-600 border-gray-200";
-            }
+    if (!userInfo) window.location.href = 'login.html';
+
+    function initProfile() {
+        document.getElementById('display-name').innerText = userInfo.name;
+        document.getElementById('userName').value = userInfo.name;
+        document.getElementById('userEmail').value = userInfo.email;
+        const badge = document.getElementById('user-role-badge');
+        if(userInfo.isAdmin) {
+            badge.innerText = "Admin";
+            badge.className += " bg-blue-600 text-white border-blue-600";
+            document.getElementById('admin-management-card').classList.remove('hidden');
+        } else {
+            badge.innerText = "User";
+            badge.className += " bg-gray-100 text-gray-600 border-gray-200";
         }
+    }
 
-        document.getElementById('profileForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const currentPassword = document.getElementById('currentPassword').value;
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
 
-            if (!currentPassword) { alert('Please enter your current password to save changes.'); return; }
-            if (newPassword && newPassword !== confirmPassword) { alert('New passwords do not match.'); return; }
+        if (!currentPassword) { alert('Please enter your current password to save changes.'); return; }
+        if (newPassword && newPassword !== confirmPassword) { alert('New passwords do not match.'); return; }
 
-            const updateData = { name: document.getElementById('userName').value, currentPassword };
-            if (newPassword) updateData.newPassword = newPassword;
+        const updateData = { name: document.getElementById('userName').value, currentPassword };
+        if (newPassword) updateData.newPassword = newPassword;
 
-            try {
-                const res = await fetch(`${API_URL}/profile`, {
-                    method: 'PUT',
-                    headers: { 
-                        'Content-Type': 'application/json', 
-                        'Authorization': `Bearer ${userInfo.token}` 
-                    },
-                    body: JSON.stringify(updateData)
-                });
+        try {
+            // Updated fetch path to match your route structure
+            const res = await fetch(`${API_URL}/users/profile`, {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'Authorization': `Bearer ${userInfo.token}` 
+                },
+                body: JSON.stringify(updateData)
+            });
 
-                const data = await res.json();
+            const data = await res.json();
 
-                if (res.ok) {
-                    // CRITICAL FIX: Save the NEW token and data sent by server
-                    localStorage.setItem('userInfo', JSON.stringify(data)); 
-                    alert('Profile updated successfully! Server now recognizes your new credentials.');
-                    window.location.reload();
-                } else {
-                    alert(data.message || 'Update failed');
-                }
-            } catch (error) {
-                alert('Connection error');
+            if (res.ok) {
+                // Save the new token and user data
+                localStorage.setItem('userInfo', JSON.stringify(data)); 
+                alert('Profile updated successfully!');
+                window.location.reload();
+            } else {
+                alert(data.message || 'Update failed');
             }
-        });
+        } catch (error) {
+            console.error('Update error:', error);
+            alert('Connection to server failed.');
+        }
+    });
 
-        function logout() {
+    function logout() {
+        if (userInfo) {
             localStorage.removeItem(`cart_${userInfo.email}`);
             localStorage.removeItem('userInfo');
-            window.location.href = 'index.html';
         }
-        initProfile();
-    </script>
+        window.location.href = 'index.html';
+    }
+    
+    initProfile();
+</script>
 </body>
 </html>

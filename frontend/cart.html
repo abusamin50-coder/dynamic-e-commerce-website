@@ -143,40 +143,112 @@
 
     <!-- Inside the script tag, update proceedToCheckout function -->
     <script>
-      async function proceedToCheckout() {
-        const cartKey = `cart_${userInfo.email}`;
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    // Ensure the user is logged in
+    if (!userInfo) window.location.href = 'login.html';
+
+    const cartKey = `cart_${userInfo.email}`;
+
+    function updateCartUI() {
         const cartItems = JSON.parse(localStorage.getItem(cartKey)) || [];
-        const totalPrice = cartItems.reduce(
-          (acc, item) => acc + item.price * item.qty,
-          0,
-        );
+        const container = document.getElementById('cart-items-container');
+        const wrapper = document.getElementById('cart-wrapper');
+        const empty = document.getElementById('empty-cart');
+        const totalEl = document.getElementById('total-price');
+
+        if (cartItems.length === 0) {
+            wrapper.classList.add('hidden');
+            empty.classList.remove('hidden');
+            return;
+        }
+
+        let total = 0;
+        container.innerHTML = cartItems.map((item, index) => {
+            total += item.price * item.qty;
+            const isOutOfStock = item.countInStock <= 0;
+            
+            return `
+                <div class="bg-white p-6 rounded-2xl border shadow-sm flex flex-col md:flex-row items-center gap-6 relative">
+                    ${isOutOfStock ? '<div class="status-badge-cart bg-red-600 text-white">Out of Stock</div>' : ''}
+                    <img src="${item.image}" class="w-24 h-24 object-cover rounded-xl ${isOutOfStock ? 'grayscale' : ''}">
+                    <div class="flex-1 text-center md:text-left">
+                        <h3 class="font-bold text-lg">${item.name}</h3>
+                        <p class="text-blue-600 font-black text-xl">$${item.price}</p>
+                    </div>
+                    <div class="flex items-center gap-4 bg-gray-50 p-2 rounded-xl border">
+                        <button onclick="updateQty(${index}, -1)" class="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition"><i class="fa-solid fa-minus text-xs"></i></button>
+                        <span class="font-bold w-6 text-center">${item.qty}</span>
+                        <button onclick="updateQty(${index}, 1)" class="w-8 h-8 flex items-center justify-center hover:bg-white rounded-lg transition"><i class="fa-solid fa-plus text-xs"></i></button>
+                    </div>
+                    <button onclick="removeItem(${index})" class="text-red-400 hover:text-red-600 transition"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
+            `;
+        }).join('');
+
+        totalEl.innerText = `$${total.toFixed(2)}`;
+        
+        // Check if any item is out of stock to disable checkout
+        const hasOutOfStock = cartItems.some(item => item.countInStock <= 0);
+        const checkoutBtn = document.getElementById('checkout-btn');
+        const warning = document.getElementById('stock-warning');
+
+        if (hasOutOfStock) {
+            checkoutBtn.disabled = true;
+            checkoutBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            warning.classList.remove('hidden');
+        } else {
+            checkoutBtn.disabled = false;
+            checkoutBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            warning.classList.add('hidden');
+        }
+    }
+
+    function updateQty(index, change) {
+        let cartItems = JSON.parse(localStorage.getItem(cartKey));
+        cartItems[index].qty += change;
+        if (cartItems[index].qty < 1) cartItems[index].qty = 1;
+        localStorage.setItem(cartKey, JSON.stringify(cartItems));
+        updateCartUI();
+    }
+
+    function removeItem(index) {
+        let cartItems = JSON.parse(localStorage.getItem(cartKey));
+        cartItems.splice(index, 1);
+        localStorage.setItem(cartKey, JSON.stringify(cartItems));
+        updateCartUI();
+    }
+
+    async function proceedToCheckout() {
+        const cartItems = JSON.parse(localStorage.getItem(cartKey)) || [];
+        const totalPrice = cartItems.reduce((acc, item) => acc + (item.price * item.qty), 0);
 
         try {
-          const res = await fetch("http://localhost:5000/api/orders", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${userInfo.token}`,
-            },
-            body: JSON.stringify({ orderItems: cartItems, totalPrice }),
-          });
+            // Use window.API_URL from config.js
+            const res = await fetch(`${window.API_URL}/orders`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${userInfo.token}`
+                },
+                body: JSON.stringify({ orderItems: cartItems, totalPrice })
+            });
 
-          if (res.ok) {
-            localStorage.removeItem(cartKey);
-            document
-              .getElementById("cart-main-section")
-              .classList.add("hidden");
-            document
-              .getElementById("success-screen")
-              .classList.remove("hidden");
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          } else {
-            alert("Checkout failed. Try again.");
-          }
+            if (res.ok) {
+                localStorage.removeItem(cartKey);
+                document.getElementById('cart-main-section').classList.add('hidden');
+                document.getElementById('success-screen').classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                alert('Checkout failed. Please try again.');
+            }
         } catch (err) {
-          console.error("Checkout error");
+            console.error('Checkout error:', err);
+            alert('Connection to server failed.');
         }
-      }
-    </script>
+    }
+
+    // Initial Load
+    updateCartUI();
+</script>
   </body>
 </html>

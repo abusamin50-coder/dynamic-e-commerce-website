@@ -76,21 +76,32 @@
         </div>
     </footer>
 
-    <script>
-        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-        let currentProduct = null;
+   <script>
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    let currentProduct = null;
 
-        function updateCartBadge() {
-            const badge = document.getElementById('cart-count');
-            if (!userInfo) { if(badge) badge.classList.add('hidden'); return; }
-            const cartKey = `cart_${userInfo.email}`;
-            const cart = JSON.parse(localStorage.getItem(cartKey)) || [];
-            if(badge) { badge.innerText = cart.length; badge.classList.toggle('hidden', cart.length === 0); }
+    // Use window.API_URL from assets/js/config.js
+    const BASE_API_URL = window.API_URL;
+
+    function updateCartBadge() {
+        const badge = document.getElementById('cart-count');
+        if (!userInfo) { if(badge) badge.classList.add('hidden'); return; }
+        const cartKey = `cart_${userInfo.email}`;
+        const cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+        if(badge) { 
+            badge.innerText = cart.length; 
+            badge.classList.toggle('hidden', cart.length === 0); 
         }
+    }
 
-        async function fetchDetails() {
-            const productId = new URLSearchParams(window.location.search).get('id');
-            const res = await fetch(`http://localhost:5000/api/products/${productId}`);
+    async function fetchDetails() {
+        const productId = new URLSearchParams(window.location.search).get('id');
+        
+        // UPDATED: Now uses BASE_API_URL instead of localhost
+        try {
+            const res = await fetch(`${BASE_API_URL}/products/${productId}`);
+            if (!res.ok) throw new Error('Product not found');
+            
             const p = await res.json();
             currentProduct = p;
             const isOutOfStock = p.countInStock <= 0;
@@ -115,37 +126,51 @@
                 </div>
             `;
             updateCartBadge();
+        } catch (error) {
+            console.error('Error fetching product:', error);
+            document.getElementById('product-container').innerHTML = `<p class="text-center text-red-500 font-bold">Product not found.</p>`;
         }
+    }
 
-        function showToast(msg, type = 'success') {
-            const toast = document.getElementById('toast');
-            if (type === 'error') { toast.classList.replace('bg-green-600', 'bg-red-600'); document.getElementById('toast-title').innerText = "Error"; } 
-            else { toast.classList.replace('bg-red-600', 'bg-green-600'); document.getElementById('toast-title').innerText = "Success!"; }
-            document.getElementById('toast-msg').innerText = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+    function showToast(msg, type = 'success') {
+        const toast = document.getElementById('toast');
+        if (type === 'error') { 
+            toast.classList.replace('bg-green-600', 'bg-red-600'); 
+            document.getElementById('toast-title').innerText = "Error"; 
+        } else { 
+            toast.classList.replace('bg-red-600', 'bg-green-600'); 
+            document.getElementById('toast-title').innerText = "Success!"; 
         }
+        document.getElementById('toast-msg').innerText = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
 
-        function addToCart() {
-            if (!userInfo) { window.location.href = 'login.html'; return; }
-            let cartKey = `cart_${userInfo.email}`;
-            let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
-            const exist = cart.find(x => x.product === currentProduct._id);
-            if (exist) { exist.qty++; } else { cart.push({ ...currentProduct, product: currentProduct._id, qty: 1 }); }
-            localStorage.setItem(cartKey, JSON.stringify(cart));
-            updateCartBadge();
-            showToast(`${currentProduct.name} added to cart!`);
-        }
+    function addToCart() {
+        if (!userInfo) { window.location.href = 'login.html'; return; }
+        let cartKey = `cart_${userInfo.email}`;
+        let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+        const exist = cart.find(x => x.product === currentProduct._id);
+        if (exist) { exist.qty++; } else { cart.push({ ...currentProduct, product: currentProduct._id, qty: 1 }); }
+        localStorage.setItem(cartKey, JSON.stringify(cart));
+        updateCartBadge();
+        showToast(`${currentProduct.name} added to cart!`);
+    }
 
-        if (userInfo) {
-            document.getElementById('nav-actions').innerHTML = `
-                <div class="flex items-center space-x-6">
-                    <a href="user.html" class="text-gray-600 flex items-center gap-2 font-bold text-sm">${userInfo.name.split(' ')[0]} <i class="fa-solid fa-user-circle text-2xl"></i></a>
-                    <a href="cart.html" class="relative text-gray-600"><i class="fa-solid fa-cart-shopping text-xl"></i><span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full hidden">0</span></a>
-                </div>
-            `;
-        }
-        fetchDetails();
-    </script>
+    // Handle Navbar Actions for logged in user
+    if (userInfo) {
+        document.getElementById('nav-actions').innerHTML = `
+            <div class="flex items-center space-x-6">
+                <a href="user.html" class="text-gray-600 flex items-center gap-2 font-bold text-sm">${userInfo.name.split(' ')[0]} <i class="fa-solid fa-user-circle text-2xl"></i></a>
+                <a href="cart.html" class="relative text-gray-600">
+                    <i class="fa-solid fa-cart-shopping text-xl"></i>
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full hidden">0</span>
+                </a>
+            </div>
+        `;
+    }
+    
+    fetchDetails();
+</script>
 </body>
 </html>

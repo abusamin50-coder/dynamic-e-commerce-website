@@ -48,35 +48,36 @@
     </div>
 
     <script>
-        const API_URL = 'http://localhost:5000/api/users/login';
+    // Remove the hardcoded localhost line. 
+    // window.API_URL is already provided by assets/js/config.js
 
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
 
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
+        try {
+            // Updated fetch URL to use window.API_URL
+            const response = await fetch(`${window.API_URL}/users/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
 
-                const data = await response.json();
+            const data = await response.json();
 
-                if (response.ok) {
-                    localStorage.setItem('userInfo', JSON.stringify(data));
-                    alert('Login Successful!');
-                    // Redirecting everyone to index.html so admin can also browse
-                    window.location.href = 'index.html';
-                } else {
-                    alert(data.message || 'Invalid email or password');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Connection to server failed.');
+            if (response.ok) {
+                localStorage.setItem('userInfo', JSON.stringify(data));
+                alert('Login Successful!');
+                window.location.href = 'index.html';
+            } else {
+                alert(data.message || 'Invalid email or password');
             }
-        });
-    </script>
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Connection to server failed.');
+        }
+    });
+</script>
 </body>
 </html>
