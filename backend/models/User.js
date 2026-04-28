@@ -2,10 +2,25 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    isAdmin: { type: Boolean, default: false, required: true }
+    name: { 
+        type: String, 
+        required: true 
+    },
+    email: { 
+        type: String, 
+        required: true, 
+        unique: true 
+    },
+    password: { 
+        type: String, 
+        required: true 
+    },
+    // isAdmin থেকে required: true সরিয়ে দেওয়া হয়েছে।
+    // Mongoose-এ Boolean ফিল্ডে false থাকলে required: true সেটাকে এরর মনে করে।
+    isAdmin: { 
+        type: Boolean, 
+        default: false 
+    }
 }, {
     timestamps: true
 });
@@ -17,7 +32,6 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 
 // Middleware to hash password before saving
 userSchema.pre('save', async function (next) {
-    // If password is not modified, move to the next middleware
     if (!this.isModified('password')) {
         return next(); 
     }
