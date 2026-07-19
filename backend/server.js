@@ -49,18 +49,22 @@ app.use((err, req, res, next) => {
   res.status(500).send({ message: "Something went wrong!" });
 });
 
-// Updated Port Logic
-const PORT = process.env.PORT || 5000;
+// Vercel-এ এই ফাইলটা serverless function হিসেবে চলে, তাই সেখানে listen() না করে app export করতে হয়
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 5000;
 
-const server = app
-  .listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-  })
-  .on("error", (err) => {
-    if (err.code === "EADDRINUSE") {
-      console.log(`⚠️ Port ${PORT} is busy, trying ${Number(PORT) + 1}...`);
-      server.listen(Number(PORT) + 1);
-    } else {
-      console.error(err);
-    }
-  });
+  const server = app
+    .listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    })
+    .on("error", (err) => {
+      if (err.code === "EADDRINUSE") {
+        console.log(`⚠️ Port ${PORT} is busy, trying ${Number(PORT) + 1}...`);
+        server.listen(Number(PORT) + 1);
+      } else {
+        console.error(err);
+      }
+    });
+}
+
+module.exports = app;
